@@ -1,28 +1,19 @@
-# app/train_model.py
-from app.data_processing import load_data, encode_data, prepare_data
-from app.model import build_wide_and_deep_model
-import tensorflow as tf
+import pandas as pd
+from .model import WideAndDeepModel
+from .data_processing import update_main_data
 
-def train_model():
-    user_data, item_data, interaction_data = load_data()
-    user_data, item_data, user_encoder, item_encoder = encode_data(user_data, item_data)
-    data = prepare_data(user_data, item_data, interaction_data)
+def train_wide_and_deep_model():
+    update_main_data()  # Cập nhật dữ liệu chính
 
-    # Xây dựng mô hình
-    model = build_wide_and_deep_model()
+    users = pd.read_csv("train_data/user_data.csv")
+    items = pd.read_csv("train_data/item_data.csv")
+    interactions = pd.read_csv("train_data/interaction_data.csv")
 
-    # Chia dữ liệu thành train và test
-    train_data = data.sample(frac=0.8, random_state=42)
-    test_data = data.drop(train_data.index)
+    X_train = pd.concat([users, items], axis=1)
+    y_train = interactions["click_times"]
 
-    train_labels = train_data['rating']
-    test_labels = test_data['rating']
+    model = WideAndDeepModel()
+    model.build_model(user_features=users.columns, item_features=items.columns)
+    model.train(X_train, y_train, epochs=10)
 
-    # Huấn luyện mô hình
-    model.fit(train_data, train_labels, epochs=5, batch_size=32, validation_data=(test_data, test_labels))
-
-    # Lưu mô hình đã huấn luyện
-    model.save('wide_deep_model.h5')
-
-if __name__ == "__main__":
-    train_model()
+    return model
