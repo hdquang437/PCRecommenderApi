@@ -14,8 +14,8 @@ def load_data():
 # Chuẩn hóa dữ liệu
 def normalize_features(interaction_data):
     scaler = MinMaxScaler()
-    interaction_data[["click_times", "purchase_times", "rating"]] = scaler.fit_transform(
-        interaction_data[["click_times", "purchase_times", "rating"]]
+    interaction_data[["click_times", "purchase_times", "rating", "is_favorite"]] = scaler.fit_transform(
+        interaction_data[["click_times", "purchase_times", "rating", "is_favorite"]]
     )
     return interaction_data
 
