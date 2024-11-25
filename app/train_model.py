@@ -1,6 +1,4 @@
-import pandas as pd
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from .data_processing import update_main_data, load_main_data
 from .paths import MODEL_PATH
