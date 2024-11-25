@@ -78,9 +78,9 @@ async def recommend(user_id: str):
     }
 
 @app.post("/add_user")
-def add_user(user_id: int, age_range: str):
+def add_user(user_id: int, age_range: str, gender: str):
     df = pd.read_csv("train_data/cache_user.csv")
-    df = df.append({"userid": user_id, "age_range": age_range}, ignore_index=True)
+    df = df.append({"userid": user_id, "age_range": age_range, "gender": gender}, ignore_index=True)
     df.to_csv("train_data/cache_user.csv", index=False)
     return {"status": "User added to cache"}
 
