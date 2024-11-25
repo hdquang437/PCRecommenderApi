@@ -1,0 +1,8 @@
+MODEL_PATH = "model/wide_deep_model"
+ITEM_DATA_PATH = "train_data/item_data.csv"
+USER_DATA_PATH = "train_data/user_data.csv"
+INTERACTION_DATA_PATH = "train_data/interaction_data.csv"
+CACHE_DELETED_ITEM_PATH = "train_data/cache_deleted_item.csv"
+CACHE_ITEM_PATH = "train_data/cache_user.csv"
+CACHE_USER_PATH = "train_data/cache_user.csv"
+CACHE_INTERACTION_PATH = "train_data/cache_interaction.csv"
