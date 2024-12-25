@@ -1,10 +1,13 @@
+import threading
 from fastapi import FastAPI
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import os
+
+from app.train_model import periodic_model_rebuild, train_and_save_model
 from .data_processing import load_main_data
-from .paths import MODEL_PATH, CACHE_DELETED_ITEM_PATH
+from .paths import MODEL_PATH, CACHE_DELETED_ITEM_PATH, CACHE_USER_PATH, CACHE_ITEM_PATH, CACHE_INTERACTION_PATH
 
 app = FastAPI()
 
@@ -29,11 +32,8 @@ async def recommend(user_id: str):
 
     # Kiểm tra xem user_id có tồn tại trong dữ liệu không
     if user_id not in user_data["userid"].values:
-        return {"message": f"User ID {user_id} doesn't exist."}
-
-     # Kiểm tra xem user_id có tồn tại không
-    if user_id not in user_data["userid"].values:
-        return {"message": f"User ID {user_id} không tồn tại trong hệ thống."}
+        # nếu user_id không tồn tại, trả về các sản phẩm phổ biến nhất
+        return get_popular_items(item_data, interaction_data)
 
     # Lấy thông tin user
     user_features = user_data[user_data["userid"] == user_id].drop(columns=["userid"]).values
@@ -74,26 +74,26 @@ async def recommend(user_id: str):
 
     # Trả về danh sách item được gợi ý
     return {
-        "recommended_items": recommended_items.to_dict(orient="records")
+        "recommended_items": recommended_items["itemid"].tolist()
     }
 
 @app.post("/add_user")
-def add_user(user_id: int, age_range: str, gender: str):
-    df = pd.read_csv("train_data/cache_user.csv")
+async def add_user(user_id: int, age_range: str, gender: str):
+    df = pd.read_csv(CACHE_USER_PATH)
     df = df.append({"userid": user_id, "age_range": age_range, "gender": gender}, ignore_index=True)
-    df.to_csv("train_data/cache_user.csv", index=False)
+    df.to_csv(CACHE_USER_PATH, index=False)
     return {"status": "User added to cache"}
 
 @app.post("/add_item")
-def add_item(item_id: int, item_type: str, price_range: str):
-    df = pd.read_csv("train_data/cache_item.csv")
+async def add_item(item_id: int, item_type: str, price_range: str):
+    df = pd.read_csv(CACHE_ITEM_PATH)
     df = df.append({"itemid": item_id, "item_type": item_type, "price_range": price_range}, ignore_index=True)
-    df.to_csv("train_data/cache_item.csv", index=False)
+    df.to_csv(CACHE_ITEM_PATH, index=False)
     return {"status": "Item added to cache"}
 
 @app.post("/add_interaction")
-def add_interaction(user_id: int, item_id: int, click_times: int, rating: int, purchase_times: int, is_favorite: bool):
-    df = pd.read_csv("train_data/cache_interaction.csv")
+async def add_interaction(user_id: int, item_id: int, click_times: int, rating: int, purchase_times: int, is_favorite: bool):
+    df = pd.read_csv(CACHE_INTERACTION_PATH)
     df = df.append({
         "userid": user_id,
         "itemid": item_id,
@@ -102,12 +102,48 @@ def add_interaction(user_id: int, item_id: int, click_times: int, rating: int, p
         "purchase_times": purchase_times,
         "is_favorite": is_favorite
     }, ignore_index=True)
-    df.to_csv("train_data/cache_interaction.csv", index=False)
+    df.to_csv(CACHE_INTERACTION_PATH, index=False)
     return {"status": "Interaction added to cache"}
 
 @app.post("/delete_item")
-def delete_item(item_id: int):
-    df = pd.read_csv("train_data/cache_delete_item.csv")
+async def delete_item(item_id: int):
+    df = pd.read_csv(CACHE_DELETED_ITEM_PATH)
     df = df.append({"itemid": item_id}, ignore_index=True)
-    df.to_csv("train_data/cache_delete_item.csv", index=False)
+    df.to_csv(CACHE_DELETED_ITEM_PATH, index=False)
     return {"status": "Item marked for deletion in cache"}
+
+# Other function
+async def get_popular_items(item_data, interaction_data):
+    # Aggregate interaction data to calculate popularity
+    interaction_data['popularity_score'] = (
+        interaction_data['click_times'] * 0.5 +  # Weight clicks as 50%
+        interaction_data['purchase_times'] * 1.0  # Weight purchases as 100%
+    )
+
+    # Sum popularity scores for each item
+    item_popularity = interaction_data.groupby('itemid')['popularity_score'].sum().reset_index()
+
+    # Merge with item data to get additional item details
+    item_popularity = item_popularity.merge(item_data, on='itemid', how='left')
+
+    # Sort items by popularity score in descending order
+    top_items = item_popularity.sort_values(by='popularity_score', ascending=False).head(10)
+
+    # Trả về danh sách item được gợi ý
+    return {
+        "recommended_items": top_items["itemid"].tolist()
+    }
+
+@app.on_event("startup")
+# Hàm khởi động thread xây dựng lại mô hình
+async def start_background_model_rebuild():
+    """
+    Chạy background thread thực hiện xây dựng lại mô hình.
+    """
+    rebuild_interval = 300  # 5 minutes
+    rebuild_thread = threading.Thread(
+        target=periodic_model_rebuild,
+        args=(rebuild_interval, train_and_save_model),
+        daemon=True  # Ensures thread exits when main program exits
+    )
+    rebuild_thread.start()

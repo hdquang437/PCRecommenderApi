@@ -2,6 +2,7 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from .data_processing import update_main_data, load_main_data
 from .paths import MODEL_PATH
+import time
 
 # Hàm load dữ liệu từ CSV
 def load_data():
@@ -33,7 +34,7 @@ def build_wide_and_deep_model(user_data, item_data):
     item_embedding = tf.keras.layers.Embedding(input_dim=1000, output_dim=32)(item_id_input)
 
     # Wide part
-    wide_input = tf.keras.layers.Concatenate()([user_features_input, item_features_input, interaction_features_input])
+    wide_input = tf.keras.layers.Concatenate()([user_features_input, item_features_input])
 
     # Deep part
     deep_input = tf.keras.layers.Concatenate()([tf.keras.layers.Flatten()(user_embedding), tf.keras.layers.Flatten()(item_embedding), interaction_features_input])
@@ -91,6 +92,31 @@ def train_and_save_model():
     # Lưu mô hình
     model.save(MODEL_PATH)
     print(f"Model saved to {MODEL_PATH}")
+
+# Hàm build lại model theo chu kỳ
+def periodic_model_rebuild(interval, model_rebuild_function):
+    """
+    Xây dựng lại mô hình theo chu kỳ.
+
+    Args:
+        interval (int): Chu kỳ tính theo giây để chờ xây dựng lại mô hình.
+        model_rebuild_function (function): Hàm build lại mô hình
+    """
+    while True:
+        # Ghi lại thời gian bắt đầu
+        start_time = time.time()
+
+        print("Rebuilding model...")
+        model_rebuild_function()
+        
+        # Ghi lại thời gian kết thúc
+        end_time = time.time()
+        
+        # Tính toán thời gian thực thi
+        execution_time = end_time - start_time
+
+        print(f"Model rebuild completed [{execution_time:.4f} seconds]. Waiting for next cycle...")
+        time.sleep(interval)
 
 # Thực thi train
 if __name__ == "__main__":
