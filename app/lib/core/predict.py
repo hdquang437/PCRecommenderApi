@@ -1,0 +1,135 @@
+import tensorflow as tf
+import pandas as pd
+from .data_manager import DataManager
+from .model_manager import ModelManager
+
+# Khởi tạo ModelManager và DataManager
+model_manager = ModelManager()
+data_manager = DataManager()
+
+# Load dữ liệu
+data_manager.load_data()
+data_manager.preprocess_data()
+data = data_manager.get_data()
+
+# Load mô hình
+model = model_manager.load_model()
+
+
+def find_similar_products(target_product_id):
+    """Tìm sản phẩm tương tự dựa trên type, price_range, location."""
+    target_product = data[data["product_id"] == target_product_id]
+
+    if target_product.empty:
+        print(f"Không tìm thấy sản phẩm {target_product_id}")
+        return pd.DataFrame()
+
+    target_type = target_product["type"].values[0]
+    target_price = target_product["price_range"].values[0]
+    target_location = target_product["location"].values[0]
+
+    # Tìm sản phẩm cùng loại
+    similar_products = data[data["type"] == target_type]
+
+    # Ưu tiên cùng price_range và location
+    similar_products["score"] = (
+        (similar_products["price_range"] == target_price).astype(int) * 0.5 +
+        (similar_products["location"] == target_location).astype(int) * 0.5
+    )
+
+    # Tổng hợp dữ liệu dựa trên toàn bộ user
+    ranking = similar_products.groupby("product_id").agg(
+        total_rating=("rating", "sum"),
+        total_clicks=("click_times", "sum"),
+        total_buys=("buy_times", "sum"),
+        match_score=("score", "mean")  # Điểm tương đồng (cùng giá, cùng location)
+    ).reset_index()
+
+    # Xếp hạng sản phẩm dựa trên trọng số
+    ranking["final_score"] = (
+        ranking["total_rating"] * 0.3 +
+        ranking["total_clicks"] * 0.3 +
+        ranking["total_buys"] * 0.4 +
+        ranking["match_score"] * 0.2  # Thêm điểm tương đồng vào tính toán
+    )
+
+    # Sắp xếp theo final_score
+    ranking = ranking.sort_values(by="final_score", ascending=False)
+
+    return ranking
+
+
+def get_user_behavior_for_similar_products(user_id, target_product_id):
+    """Lấy thông tin trung bình từ các sản phẩm tương tự mà user đã tương tác."""
+    target_product = data[data["product_id"] == target_product_id]
+
+    if target_product.empty:
+        print(f"Không tìm thấy sản phẩm {target_product_id}")
+        return None
+
+    target_type = target_product["type"].values[0]
+    target_price = target_product["price_range"].values[0]
+    target_location = target_product["location"].values[0]
+
+    # Lọc các sản phẩm tương tự mà user đã từng tương tác
+    similar_products = data[
+        (data["user_id"] == user_id) &
+        (data["type"] == target_type)
+    ]
+
+    # Ưu tiên sản phẩm có price_range và location giống nhau
+    similar_products["match_score"] = (
+        (similar_products["price_range"] == target_price).astype(int) * 0.5 +
+        (similar_products["location"] == target_location).astype(int) * 0.5
+    )
+
+    # Nếu không có sản phẩm tương tự nào user đã tương tác, return None
+    if similar_products.empty:
+        return None
+
+    # Tính trung bình rating, click_times, buy_times của user với nhóm sản phẩm tương tự
+    behavior_avg = similar_products.agg({
+        "rating": "mean",
+        "click_times": "mean",
+        "buy_times": "mean"
+    }).to_dict()
+
+    return behavior_avg
+
+
+def predict(user_id, product_id):
+    """Dự đoán khả năng user mua sản phẩm, ngay cả khi chưa từng tương tác với nó."""
+    sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)]
+
+    if not sample.empty:
+        # Dữ liệu có sẵn, thực hiện dự đoán
+        sample_dict = dict(sample.iloc[0])
+        sample_dict.pop("label")  # Loại bỏ nhãn
+        sample_ds = tf.data.Dataset.from_tensor_slices((sample_dict,)).batch(1)
+
+        prediction = model.predict(sample_ds)
+        print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
+        return
+
+    print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}. Dự đoán dựa trên sản phẩm tương tự...")
+
+    # Lấy thông tin từ sản phẩm tương tự user đã từng xem/mua
+    user_behavior = get_user_behavior_for_similar_products(user_id, product_id)
+
+    if user_behavior is None:
+        print("User chưa từng tương tác với sản phẩm nào cùng loại. Không thể dự đoán.")
+        return
+
+    # Tạo mẫu dữ liệu giả lập để đưa vào mô hình
+    target_product = data[data["product_id"] == product_id].iloc[0].to_dict()
+
+    # Gán thông tin user behavior vào
+    target_product.update(user_behavior)
+    target_product.pop("label")  # Loại bỏ nhãn
+    target_product.pop("user_id")  # Không cần user_id khi đưa vào model
+    target_product.pop("product_id")  # Không cần product_id khi đưa vào model
+
+    sample_ds = tf.data.Dataset.from_tensor_slices((target_product,)).batch(1)
+
+    prediction = model.predict(sample_ds)
+    print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%} (dựa trên sản phẩm tương tự)")
