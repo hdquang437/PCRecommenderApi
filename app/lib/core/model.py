@@ -5,9 +5,9 @@ from keras import layers
 
 vocab_sizes = {
     "type": 5,
-    "location": 5,
+    "location": 63,
     "gender": 2,
-    "age_range": 10,
+    "age_range": 4,
     "price_range": 5,
 }
 
@@ -16,11 +16,11 @@ class WideAndDeepModel(tfrs.Model):
         super(WideAndDeepModel, self).__init__(*args, **kwargs)
 
         # Embedding layers cho categorical features
-        self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=8)
-        self.location_embedding = layers.Embedding(input_dim=vocab_sizes["location"], output_dim=8)
-        self.gender_embedding = layers.Embedding(input_dim=vocab_sizes["gender"], output_dim=4)
-        self.age_embedding = layers.Embedding(input_dim=vocab_sizes["age_range"], output_dim=4)
-        self.price_embedding = layers.Embedding(input_dim=vocab_sizes["price_range"], output_dim=4)
+        self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=2)
+        self.location_embedding = layers.Embedding(input_dim=vocab_sizes["location"], output_dim=7)
+        self.gender_embedding = layers.Embedding(input_dim=vocab_sizes["gender"], output_dim=1)
+        self.age_embedding = layers.Embedding(input_dim=vocab_sizes["age_range"], output_dim=2)
+        self.price_embedding = layers.Embedding(input_dim=vocab_sizes["price_range"], output_dim=2)
 
         # Mô hình Wide (tuyến tính)
         self.wide = keras.Sequential([
