@@ -1,6 +1,8 @@
 import tensorflow as tf
 from .data_manager import DataManager
 from .model_manager import ModelManager
+from tensorflow import keras
+from keras import layers
 
 def train_model():
   BATCH_SIZE = 32
@@ -34,7 +36,7 @@ def train_model():
 
   # Train mô hình
   model.add_loss(tf.cast(tf.reduce_sum(model.losses), dtype=tf.float32))
-  model.fit(train_ds, epochs=1, validation_data=test_ds, steps_per_epoch=steps_per_epoch)
+  model.fit(train_ds, epochs=10, validation_data=test_ds, steps_per_epoch=steps_per_epoch)
 
   # Gọi model trên một batch dữ liệu test trước khi save
   dummy_input = next(iter(train_ds.take(1)))[0]  # Lấy features

@@ -1,5 +1,6 @@
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 from .data_manager import DataManager
 from .model_manager import ModelManager
 
@@ -105,11 +106,15 @@ def predict(user_id, product_id):
         # Dữ liệu có sẵn, thực hiện dự đoán
         sample_dict = dict(sample.iloc[0])
         sample_dict.pop("label")  # Loại bỏ nhãn
-        sample_ds = tf.data.Dataset.from_tensor_slices((sample_dict,)).batch(1)
+        sample_dict.pop("user_id")  # Không cần user_id khi đưa vào model
+        sample_dict.pop("product_id")  # Không cần product_id khi đưa vào model
+
+        sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
+        print(sample_ds)
 
         prediction = model.predict(sample_ds)
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
-        return
+        return prediction[0][0]
 
     print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}. Dự đoán dựa trên sản phẩm tương tự...")
 
@@ -118,7 +123,7 @@ def predict(user_id, product_id):
 
     if user_behavior is None:
         print("User chưa từng tương tác với sản phẩm nào cùng loại. Không thể dự đoán.")
-        return
+        return -1
 
     # Tạo mẫu dữ liệu giả lập để đưa vào mô hình
     target_product = data[data["product_id"] == product_id].iloc[0].to_dict()
@@ -129,7 +134,28 @@ def predict(user_id, product_id):
     target_product.pop("user_id")  # Không cần user_id khi đưa vào model
     target_product.pop("product_id")  # Không cần product_id khi đưa vào model
 
-    sample_ds = tf.data.Dataset.from_tensor_slices((target_product,)).batch(1)
+    sample_ds = tf.data.Dataset.from_tensors(target_product).batch(1)
 
     prediction = model.predict(sample_ds)
     print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%} (dựa trên sản phẩm tương tự)")
+    return prediction[0][0]
+
+def get_top_popular_products(n=10):
+    """Tìm n sản phẩm phổ biến nhất dựa trên dữ liệu thực tế."""
+    popular_products = data.groupby("product_id").agg(
+        total_rating=("rating", "sum"),
+        total_clicks=("click_times", "sum"),
+        total_buys=("buy_times", "sum")
+    ).reset_index()
+
+    # Tính điểm tổng hợp (có thể điều chỉnh trọng số)
+    popular_products["popularity_score"] = (
+        popular_products["total_rating"] * 0.5 +
+        popular_products["total_clicks"] * 0.1 +
+        popular_products["total_buys"] * 0.4
+    )
+
+    # Sắp xếp theo độ phổ biến
+    top_products = popular_products.sort_values(by="popularity_score", ascending=False)["product_id"].head(n).tolist()
+    
+    return top_products

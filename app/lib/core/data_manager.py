@@ -29,7 +29,7 @@ class DataManager:
                 "label": [1.0, 0.0, 1.0, 0.0, 1.0]
             })
 
-            self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 0.0}, inplace=True)
+            self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 3.0}, inplace=True)
             print("Data loaded!")
 
     def preprocess_data(self, reload=False):

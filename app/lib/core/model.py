@@ -12,8 +12,8 @@ vocab_sizes = {
 }
 
 class WideAndDeepModel(tfrs.Model):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super(WideAndDeepModel, self).__init__(*args, **kwargs)
 
         # Embedding layers cho categorical features
         self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=8)
@@ -24,6 +24,7 @@ class WideAndDeepModel(tfrs.Model):
 
         # Mô hình Wide (tuyến tính)
         self.wide = keras.Sequential([
+            layers.BatchNormalization(),  # Thêm bước chuẩn hóa trước
             layers.Dense(1, activation='linear')
         ])
 
@@ -64,9 +65,13 @@ class WideAndDeepModel(tfrs.Model):
 
         # Wide Model (Dùng trực tiếp feature số)
         wide_output = self.wide(numerical_features)
-
         deep_output = self.deep(deep_input)
-        output = tf.cast(wide_output + deep_output, tf.float32)
+
+        # In giá trị để debug
+        # tf.print("Wide output:", wide_output)
+        # tf.print("Deep output:", deep_output)
+
+        output = tf.nn.sigmoid(tf.cast(wide_output + deep_output, tf.float32))
 
         return output
     
@@ -86,6 +91,5 @@ class WideAndDeepModel(tfrs.Model):
 
     @classmethod
     def from_config(cls, config):
-        """Tạo lại model từ config nhưng bỏ các tham số không cần thiết."""
-        config.pop("trainable", None)  # Loại bỏ tham số trainable
+        """Tạo lại model từ config"""
         return cls(**config)
