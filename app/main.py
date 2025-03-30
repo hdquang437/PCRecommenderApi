@@ -15,11 +15,11 @@ app = FastAPI()
 data_manager = DataManager()
 
 @app.get("/recommend")
-async def recommend(uid: str):
+async def recommend(uid: str, max: int):
     recommendations = []
     
     product_ids = data_manager.get_product_ids()
-    top_k = min(20, len(product_ids))
+    top_k = min(max, len(product_ids))
 
     for product_id in product_ids:
         score = predict(uid, product_id)
