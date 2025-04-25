@@ -8,10 +8,6 @@ from .model_manager import ModelManager
 model_manager = ModelManager()
 data_manager = DataManager()
 
-# Load dữ liệu
-data_manager.load_data()
-data_manager.preprocess_data()
-data = data_manager.get_data()
 
 # Load mô hình
 model = model_manager.load_model()
@@ -19,6 +15,9 @@ model = model_manager.load_model()
 
 def find_similar_products(target_product_id):
     """Tìm sản phẩm tương tự dựa trên type, price_range, location."""
+
+    data = data_manager.get_data()
+
     target_product = data[data["product_id"] == target_product_id]
 
     if target_product.empty:
@@ -62,6 +61,9 @@ def find_similar_products(target_product_id):
 
 def get_user_behavior_for_similar_products(user_id, target_product_id):
     """Lấy thông tin trung bình từ các sản phẩm tương tự mà user đã tương tác."""
+
+    data = data_manager.get_data()
+
     target_product = data[data["product_id"] == target_product_id]
 
     if target_product.empty:
@@ -100,6 +102,8 @@ def get_user_behavior_for_similar_products(user_id, target_product_id):
 
 def predict(user_id, product_id):
     """Dự đoán khả năng user mua sản phẩm, ngay cả khi chưa từng tương tác với nó."""
+    data = data_manager.get_data()
+    
     sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)]
 
     if not sample.empty:
@@ -142,6 +146,8 @@ def predict(user_id, product_id):
 
 def get_top_popular_products(n=10):
     """Tìm n sản phẩm phổ biến nhất dựa trên dữ liệu thực tế."""
+    data = data_manager.get_data()
+    
     popular_products = data.groupby("product_id").agg(
         total_rating=("rating", "sum"),
         total_clicks=("click_times", "sum"),

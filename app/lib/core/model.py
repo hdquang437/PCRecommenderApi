@@ -4,10 +4,10 @@ from tensorflow import keras
 from keras import layers
 
 vocab_sizes = {
-    "type": 5,
+    "type": 30,
     "location": 63,
     "gender": 2,
-    "age_range": 4,
+    "age_range": 5,
     "price_range": 5,
 }
 
@@ -15,12 +15,15 @@ class WideAndDeepModel(tfrs.Model):
     def __init__(self, *args, **kwargs):
         super(WideAndDeepModel, self).__init__(*args, **kwargs)
 
+        def get_output_dim(input_dim):
+            return min(50, round(input_dim ** 0.25 * 4))
+
         # Embedding layers cho categorical features
-        self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=2)
-        self.location_embedding = layers.Embedding(input_dim=vocab_sizes["location"], output_dim=7)
-        self.gender_embedding = layers.Embedding(input_dim=vocab_sizes["gender"], output_dim=1)
-        self.age_embedding = layers.Embedding(input_dim=vocab_sizes["age_range"], output_dim=2)
-        self.price_embedding = layers.Embedding(input_dim=vocab_sizes["price_range"], output_dim=2)
+        self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=get_output_dim(vocab_sizes["type"]))
+        self.location_embedding = layers.Embedding(input_dim=vocab_sizes["location"], output_dim=get_output_dim(vocab_sizes["location"]))
+        self.gender_embedding = layers.Embedding(input_dim=vocab_sizes["gender"], output_dim=get_output_dim(vocab_sizes["gender"]))
+        self.age_embedding = layers.Embedding(input_dim=vocab_sizes["age_range"], output_dim=get_output_dim(vocab_sizes["age_range"]))
+        self.price_embedding = layers.Embedding(input_dim=vocab_sizes["price_range"], output_dim=get_output_dim(vocab_sizes["price_range"]))
 
         # Mô hình Wide (tuyến tính)
         self.wide = keras.Sequential([
@@ -54,13 +57,22 @@ class WideAndDeepModel(tfrs.Model):
         age_embedded = self.age_embedding(tf.cast(features["age_range"], tf.int32))
         price_embedded = self.price_embedding(tf.cast(features["price_range"], tf.int32))
 
+        # deep_input = tf.concat([
+        #     tf.reshape(gender_embedded, (-1, 4)),  
+        #     tf.reshape(age_embedded, (-1, 4)),
+        #     tf.reshape(type_embedded, (-1, 8)),  
+        #     tf.reshape(price_embedded, (-1, 4)), 
+        #     tf.reshape(location_embedded, (-1, 8)),     
+        #     numerical_features  # Dùng feature số cho cả Deep Model
+        # ], axis=1)
+
         deep_input = tf.concat([
-            tf.reshape(gender_embedded, (-1, 4)),  
-            tf.reshape(age_embedded, (-1, 4)),
-            tf.reshape(type_embedded, (-1, 8)),  
-            tf.reshape(price_embedded, (-1, 4)), 
-            tf.reshape(location_embedded, (-1, 8)),     
-            numerical_features  # Dùng feature số cho cả Deep Model
+            gender_embedded,
+            age_embedded,
+            type_embedded,
+            price_embedded,
+            location_embedded,
+            numerical_features
         ], axis=1)
 
         # Wide Model (Dùng trực tiếp feature số)

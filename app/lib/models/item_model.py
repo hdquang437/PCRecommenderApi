@@ -6,6 +6,7 @@ from datetime import datetime
 class Item:
     id: str
     item_type: str
+    seller_id: str
     price: int
     add_date: datetime = datetime.now()
 
@@ -13,7 +14,8 @@ class Item:
     def from_dict(item_id, data):
         return Item(
             id=item_id,
-            name=data["itemType"],
-            email=data["price"],
-            created_at=datetime.fromisoformat(data["addDate"])
+            seller_id=data["sellerID"],
+            item_type=data["itemType"],
+            price=data["price"],
+            add_date=datetime.fromtimestamp(data["addDate"].timestamp())
         )

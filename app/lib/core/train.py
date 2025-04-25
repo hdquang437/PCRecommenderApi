@@ -10,12 +10,12 @@ def train_model():
 
   # Khởi tạo DataManager (Singleton)
   data_manager = DataManager()
-  data_manager.load_data()
-  data_manager.preprocess_data()
 
   # Lấy dataset
   data = data_manager.get_data()
   dataset = data_manager.get_dataset()
+
+  print("Data columns:", dataset)
 
   # Chia train / test
   train_size = int(TRAIN_RATIO * len(data))

@@ -41,10 +41,14 @@ async def recommend(uid: str, max: int):
 
 @app.post("/build")
 async def build():
+    print("Building!")
     try:
         train_model()
+        print("Build done!")
         return {"message": "Build successfully"}
     except Exception as e:
+        print("Build failed with error: ")
+        print(e)
         return {"message": e}
 
 
@@ -74,16 +78,9 @@ def periodic_train_model(interval, model_rebuild_function):
         
         time.sleep(interval)
 
-# @app.on_event("startup")
-# # Hàm khởi động thread xây dựng lại mô hình
-# async def start_background_model_rebuild():
-#     """
-#     Chạy background thread thực hiện xây dựng lại mô hình.
-#     """
-#     rebuild_interval = 1800  # 30 minutes
-#     rebuild_thread = threading.Thread(
-#         target=periodic_train_model,
-#         args=(rebuild_interval, train_model),
-#         daemon=True  # Ensures thread exits when main program exits
-#     )
-#     rebuild_thread.start()
+
+@app.on_event("startup")
+# Hàm khởi động thread xây dựng lại mô hình
+async def init():
+    await data_manager.load_data(True)
+    data_manager.preprocess_data()
