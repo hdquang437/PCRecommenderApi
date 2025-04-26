@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
@@ -21,8 +22,9 @@ class DataManager:
             if not firebase_admin._apps:
                 cred = credentials.Certificate(FIREBASE_KEY_PATH)
                 firebase_admin.initialize_app(cred)
+            
+            cls.loop = asyncio.get_event_loop()
 
-            cls.start_streams
         return cls._instance
 
     def start_streams(self):
@@ -39,7 +41,10 @@ class DataManager:
 
     def _on_change(self, docs, changes, read_time):
         print("Change detected, reloading data...")
-        self.load_data(reload=True)
+        self.loop.call_soon_threadsafe(asyncio.create_task, self._handle_reload())
+
+    async def _handle_reload(self):
+        await self.load_data(reload=True)
         self.preprocess_data(reload=True)
 
     async def load_data(self, reload=False):

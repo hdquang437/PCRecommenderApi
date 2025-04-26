@@ -84,3 +84,4 @@ def periodic_train_model(interval, model_rebuild_function):
 async def init():
     await data_manager.load_data(True)
     data_manager.preprocess_data()
+    data_manager.start_streams()
