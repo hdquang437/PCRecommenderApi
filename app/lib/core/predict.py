@@ -120,29 +120,36 @@ def predict(user_id, product_id):
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
         return prediction[0][0]
 
-    print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}. Dự đoán dựa trên sản phẩm tương tự...")
+    print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}")
 
-    # Lấy thông tin từ sản phẩm tương tự user đã từng xem/mua
-    user_behavior = get_user_behavior_for_similar_products(user_id, product_id)
-
-    if user_behavior is None:
-        print("User chưa từng tương tác với sản phẩm nào cùng loại. Không thể dự đoán.")
-        return -1
-
-    # Tạo mẫu dữ liệu giả lập để đưa vào mô hình
-    target_product = data[data["product_id"] == product_id].iloc[0].to_dict()
-
-    # Gán thông tin user behavior vào
-    target_product.update(user_behavior)
-    target_product.pop("label")  # Loại bỏ nhãn
-    target_product.pop("user_id")  # Không cần user_id khi đưa vào model
-    target_product.pop("product_id")  # Không cần product_id khi đưa vào model
-
-    sample_ds = tf.data.Dataset.from_tensors(target_product).batch(1)
-
+    sample = data_manager.build_empty_sample(user_id, product_id)
+    sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
+    print(sample_ds)
     prediction = model.predict(sample_ds)
-    print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%} (dựa trên sản phẩm tương tự)")
+    print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
     return prediction[0][0]
+
+    # # Lấy thông tin từ sản phẩm tương tự user đã từng xem/mua
+    # user_behavior = get_user_behavior_for_similar_products(user_id, product_id)
+
+    # if user_behavior is None:
+    #     print("User chưa từng tương tác với sản phẩm nào cùng loại. Không thể dự đoán.")
+    #     return -1
+
+    # # Tạo mẫu dữ liệu giả lập để đưa vào mô hình
+    # target_product = data[data["product_id"] == product_id].iloc[0].to_dict()
+
+    # # Gán thông tin user behavior vào
+    # target_product.update(user_behavior)
+    # target_product.pop("label")  # Loại bỏ nhãn
+    # target_product.pop("user_id")  # Không cần user_id khi đưa vào model
+    # target_product.pop("product_id")  # Không cần product_id khi đưa vào model
+
+    # sample_ds = tf.data.Dataset.from_tensors(target_product).batch(1)
+
+    # prediction = model.predict(sample_ds)
+    # print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%} (dựa trên sản phẩm tương tự)")
+    # return prediction[0][0]
 
 def get_top_popular_products(n=10):
     """Tìm n sản phẩm phổ biến nhất dựa trên dữ liệu thực tế."""

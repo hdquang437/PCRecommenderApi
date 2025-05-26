@@ -7,6 +7,7 @@ import tensorflow as tf
 from ...lib.models.interaction_repository import InteractionRepository
 from ...lib.models.item_repository import ItemRepository
 from ...lib.models.user_repository import UserRepository
+from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
 
 class DataManager:
@@ -17,6 +18,7 @@ class DataManager:
             cls._instance = super(DataManager, cls).__new__(cls)
             cls._instance.data = None
             cls._instance.dataset = None
+            cls._instance.firebaseData = {}
             cls._instance.listeners = []
             # Kiểm tra nếu chưa được khởi tạo
             if not firebase_admin._apps:
@@ -34,10 +36,12 @@ class DataManager:
         user_repo = UserRepository()
         item_repo = ItemRepository()
         interaction_repo = InteractionRepository()
+        shop_repo = ShopRepository()
 
         self.listeners.append(user_repo.listen(self._on_change))
         self.listeners.append(item_repo.listen(self._on_change))
         self.listeners.append(interaction_repo.listen(self._on_change))
+        self.listeners.append(shop_repo.listen(self._on_change))
 
     def _on_change(self, docs, changes, read_time):
         print("Change detected, reloading data...")
@@ -69,16 +73,24 @@ class DataManager:
             user_repo = UserRepository()
             item_repo = ItemRepository()
             interaction_repo = InteractionRepository()
+            shop_repo = ShopRepository()
 
             users = await user_repo.get_all_users()
             items = await item_repo.get_all_items()
             interactions = await interaction_repo.get_all_interactions()
+            shops = await shop_repo.get_all_shops()
 
             user_df = pd.DataFrame([user.__dict__ for user in users])
+            shop_df = pd.DataFrame([shop.__dict__ for shop in shops])
             item_df = pd.DataFrame([item.__dict__ for item in items])
             interaction_df = pd.DataFrame([interaction.__dict__ for interaction in interactions])
             # Lấy location người bán từ user_df
-            seller_df = user_df[["id", "location"]].rename(columns={"id": "seller_id", "location": "seller_location"})
+            seller_df = shop_df[["id", "location"]].rename(columns={"id": "seller_id", "location": "seller_location"})
+
+            self.firebaseData["users"] = user_df
+            self.firebaseData["items"] = item_df
+            self.firebaseData["interactions"] = interaction_df
+            self.firebaseData["sellers"] = seller_df
 
             # Chuyển date_of_birth thành age_range
             current_year = datetime.now().year
@@ -172,3 +184,65 @@ class DataManager:
         """Return product ids"""
         return self.data["product_id"].unique().tolist()
 
+    def build_empty_sample(self, user_id, product_id):
+        """Tạo sample giả với buy_times, click_times, rating = 0 nếu chưa có tương tác."""
+        user_df = self.firebaseData.get("users")
+        item_df = self.firebaseData.get("items")
+        seller_df = self.firebaseData.get("sellers")
+
+        # Lấy thông tin user
+        user_row = user_df[user_df["id"] == user_id]
+        if user_row.empty:
+            raise ValueError(f"User ID {user_id} not found")
+        user_row = user_row.iloc[0]
+
+        # Tính age_range
+        current_year = datetime.now().year
+        age = current_year - user_row["date_of_birth"].year
+        if age <= 25:
+            age_range = "18-25"
+        elif age <= 35:
+            age_range = "26-35"
+        elif age <= 50:
+            age_range = "36-50"
+        else:
+            age_range = "50+"
+
+        # Lấy thông tin item
+        item_row = item_df[item_df["id"] == product_id]
+        if item_row.empty:
+            raise ValueError(f"Product ID {product_id} not found")
+        item_row = item_row.iloc[0]
+
+        # Tính price_range
+        price = item_row["price"]
+        if price <= 200000:
+            price_range = "budget"
+        elif price <= 1000000:
+            price_range = "mid-range"
+        elif price <= 3000000:
+            price_range = "upper mid-range"
+        elif price <= 7000000:
+            price_range = "premium"
+        else:
+            price_range = "flagship"
+
+        # Lấy location từ seller
+        seller_row = seller_df[seller_df["seller_id"] == item_row["seller_id"]]
+        location = seller_row["seller_location"].values[0] if not seller_row.empty else "unknown"
+
+        sample = {
+            "user_id": user_id,
+            "gender": user_row["gender"],
+            "age_range": age_range,
+            "product_id": product_id,
+            "type": item_row["item_type"],
+            "price_range": price_range,
+            "location": location,
+            "click_times": 0.0,
+            "buy_times": 0.0,
+            "rating": 0.0,
+            "label": 0.0
+        }
+
+        return sample
