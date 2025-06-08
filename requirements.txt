@@ -1,7 +1,7 @@
 fastapi
 pandas
 numpy
-tensorflow
+tensorflow-cpu==2.13.0
 tensorflow-recommenders
 uvicorn
 firebase-admin
