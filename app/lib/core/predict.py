@@ -114,7 +114,7 @@ def predict(user_id, product_id):
         sample_dict.pop("product_id")  # Không cần product_id khi đưa vào model
 
         sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
-        print(sample_ds)
+        # print(sample_ds)
 
         prediction = model.predict(sample_ds)
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
@@ -122,9 +122,11 @@ def predict(user_id, product_id):
 
     print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}")
 
-    sample = data_manager.build_empty_sample(user_id, product_id)
-    sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
-    print(sample_ds)
+    sample_dict = data_manager.build_empty_sample(user_id, product_id)
+    # Mã hóa categorical fields trước khi tạo dataset
+    sample_encoded = data_manager.encode_sample(sample_dict)
+    sample_ds = tf.data.Dataset.from_tensors(sample_encoded).batch(1)
+    # print(sample_ds)
     prediction = model.predict(sample_ds)
     print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
     return prediction[0][0]

@@ -156,6 +156,14 @@ class DataManager:
             self.data["rating"] = self.data["rating"].astype(float)
             self.data["label"] = self.data["label"].astype(float)
 
+            self.category_mappings = {
+                "gender": list(self.data["gender"].astype("category").cat.categories),
+                "age_range": list(self.data["age_range"].astype("category").cat.categories),
+                "type": list(self.data["type"].astype("category").cat.categories),
+                "price_range": list(self.data["price_range"].astype("category").cat.categories),
+                "location": list(self.data["location"].astype("category").cat.categories),
+            }
+
             # Tạo TensorFlow dataset
 
             self.dataset = tf.data.Dataset.from_tensor_slices((
@@ -246,3 +254,30 @@ class DataManager:
         }
 
         return sample
+    
+    def encode_sample(self, sample_dict):
+        """
+        Chuyển đổi các trường categorical trong sample_dict thành số theo category_mappings.
+        category_mappings: dict, key = field name, value = list các category theo thứ tự mã hóa.
+        """
+        sample_encoded = sample_dict.copy()
+        category_mappings = self.category_mappings
+
+        for col in ["gender", "age_range", "type", "price_range", "location"]:
+            categories = category_mappings.get(col)
+            if categories is None:
+                raise ValueError(f"Missing category mapping for {col}")
+
+            val = sample_dict[col]
+            if val in categories:
+                sample_encoded[col] = categories.index(val)
+            else:
+                # Nếu giá trị không có trong danh sách category, có thể gán -1 hoặc 0 tùy mục đích
+                sample_encoded[col] = -1
+
+        # Đảm bảo các trường số là float
+        sample_encoded["click_times"] = float(sample_encoded["click_times"])
+        sample_encoded["buy_times"] = float(sample_encoded["buy_times"])
+        sample_encoded["rating"] = float(sample_encoded["rating"])
+
+        return sample_encoded
