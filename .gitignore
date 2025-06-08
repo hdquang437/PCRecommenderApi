@@ -396,5 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/env
+env/
 app/lib/firestore/firebase_key.json
