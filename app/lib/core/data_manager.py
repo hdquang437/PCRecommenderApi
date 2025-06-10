@@ -9,6 +9,8 @@ from ...lib.models.item_repository import ItemRepository
 from ...lib.models.user_repository import UserRepository
 from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
+import os
+import json
 
 class DataManager:
     _instance = None  # Biến lưu instance duy nhất của class
@@ -22,7 +24,13 @@ class DataManager:
             cls._instance.listeners = []
             # Kiểm tra nếu chưa được khởi tạo
             if not firebase_admin._apps:
-                cred = credentials.Certificate(FIREBASE_KEY_PATH)
+                # cred = credentials.Certificate(FIREBASE_KEY_PATH)
+                # firebase_admin.initialize_app(cred)
+                firebase_cred_json = os.getenv("FIREBASE_KEY_JSON")
+                cred_dict = json.loads(firebase_cred_json)
+
+                # cred = credentials.Certificate("./firebase_key.json")
+                cred = credentials.Certificate(cred_dict)
                 firebase_admin.initialize_app(cred)
             
             cls.loop = asyncio.get_event_loop()
