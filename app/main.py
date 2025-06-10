@@ -14,6 +14,10 @@ from .paths import MODEL_PATH, CACHE_DELETED_ITEM_PATH, CACHE_USER_PATH, CACHE_I
 app = FastAPI()
 data_manager = DataManager()
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
 @app.get("/recommend")
 async def recommend(uid: str, max: int):
     recommendations = []
