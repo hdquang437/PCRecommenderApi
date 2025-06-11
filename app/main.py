@@ -89,3 +89,4 @@ async def init():
     await data_manager.load_data(True)
     data_manager.preprocess_data()
     data_manager.start_streams()
+    os.environ["TF_DATA_AUTOTUNE_RAM_budget"] = "104857600"  # 100 MB
