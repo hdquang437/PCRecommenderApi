@@ -145,7 +145,7 @@ class DataManager:
 
             self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 3.0}, inplace=True)
             print("Data loaded!")
-            print(self.data)
+            # print(self.data)
 
     def preprocess_data(self, reload=False):
         """Tiền xử lý dữ liệu thành TensorFlow dataset."""
