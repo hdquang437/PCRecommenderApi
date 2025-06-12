@@ -15,43 +15,49 @@ from ...paths import FIREBASE_KEY_PATH
 
 class DataManager:
     _instance = None  # Biến lưu instance duy nhất của class
+    _lock = threading.Lock()  # Lock cho thread safety
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(DataManager, cls).__new__(cls)
-            cls._instance.data = None
-            cls._instance.dataset = None
-            cls._instance.firebaseData = {}
-            cls._instance.listeners = []
-            cls._instance.is_local_deployment = False  # Flag để kiểm tra local deployment
-            cls._instance.reload_timer = None  # Timer cho debouncing
-            cls._instance.reload_pending = False  # Flag để kiểm tra reload đang pending
-            
-            # Kiểm tra nếu chưa được khởi tạo
-            if not firebase_admin._apps:
-                try:
-                    # Thử sử dụng file Firebase key trước
-                    cred = credentials.Certificate(FIREBASE_KEY_PATH)
-                    firebase_admin.initialize_app(cred)
-                    cls._instance.is_local_deployment = True  # Đang chạy local
-                    print(f"Firebase initialized with key file: {FIREBASE_KEY_PATH}")
-                except Exception as e:
-                    print(f"Failed to load Firebase key from file: {e}")
-                    try:
-                        # Fallback: sử dụng environment variable
-                        firebase_cred_json = os.getenv("FIREBASE_KEY_JSON")
-                        if firebase_cred_json:
-                            cred_dict = json.loads(firebase_cred_json)
-                            cred = credentials.Certificate(cred_dict)
+            with cls._lock:  # Thread-safe singleton
+                if cls._instance is None:  # Double-check locking
+                    cls._instance = super(DataManager, cls).__new__(cls)
+                    cls._instance.data = None
+                    cls._instance.dataset = None
+                    cls._instance.firebaseData = {}
+                    cls._instance.listeners = []
+                    cls._instance.is_local_deployment = False  # Flag để kiểm tra local deployment
+                    cls._instance.reload_timer = None  # Timer cho debouncing
+                    cls._instance.reload_pending = False  # Flag để kiểm tra reload đang pending
+                    cls._instance.data_lock = threading.RLock()  # Lock cho data operations
+                    cls._instance.init_lock = threading.Lock()  # Lock cho initialization
+                    cls._instance.is_initializing = False  # Flag cho initialization
+                    
+                    # Kiểm tra nếu chưa được khởi tạo
+                    if not firebase_admin._apps:
+                        try:
+                            # Thử sử dụng file Firebase key trước
+                            cred = credentials.Certificate(FIREBASE_KEY_PATH)
                             firebase_admin.initialize_app(cred)
-                            cls._instance.is_local_deployment = False  # Đang chạy production
-                            print("Firebase initialized with environment variable FIREBASE_KEY_JSON")
-                        else:
-                            raise ValueError("Both FIREBASE_KEY_PATH file and FIREBASE_KEY_JSON environment variable are unavailable")
-                    except Exception as env_error:
-                        raise ValueError(f"Failed to initialize Firebase: {env_error}")
-            
-            cls.loop = asyncio.get_event_loop()
+                            cls._instance.is_local_deployment = True  # Đang chạy local
+                            print(f"Firebase initialized with key file: {FIREBASE_KEY_PATH}")
+                        except Exception as e:
+                            print(f"Failed to load Firebase key from file: {e}")
+                            try:
+                                # Fallback: sử dụng environment variable
+                                firebase_cred_json = os.getenv("FIREBASE_KEY_JSON")
+                                if firebase_cred_json:
+                                    cred_dict = json.loads(firebase_cred_json)
+                                    cred = credentials.Certificate(cred_dict)
+                                    firebase_admin.initialize_app(cred)
+                                    cls._instance.is_local_deployment = False  # Đang chạy production
+                                    print("Firebase initialized with environment variable FIREBASE_KEY_JSON")
+                                else:
+                                    raise ValueError("Both FIREBASE_KEY_PATH file and FIREBASE_KEY_JSON environment variable are unavailable")
+                            except Exception as env_error:
+                                raise ValueError(f"Failed to initialize Firebase: {env_error}")
+                    
+                    cls.loop = asyncio.get_event_loop()
 
         return cls._instance
 
@@ -242,32 +248,57 @@ class DataManager:
             ))
 
             self.dataset = self.dataset.shuffle(len(self.data)).batch(2, drop_remainder=True)
-
+            
             print("Data preprocessing completed!")
 
     def get_data(self):
-        """Trả về dữ liệu dưới dạng pandas DataFrame."""
-        return self.data
+        """Trả về dữ liệu dưới dạng pandas DataFrame - Thread safe read."""
+        with self.data_lock:
+            if self.data is None:
+                raise ValueError("Data not loaded yet")
+            # Trả về copy để tránh modification từ bên ngoài
+            return self.data.copy()
 
     def get_dataset(self):
-        """Trả về dữ liệu dưới dạng TensorFlow dataset."""
-        return self.dataset
+        """Trả về dữ liệu dưới dạng TensorFlow dataset - Thread safe read."""
+        with self.data_lock:
+            if self.dataset is None:
+                raise ValueError("Dataset not preprocessed yet")
+            return self.dataset
     
     def get_product_ids(self):
-        """Return product ids"""
-        return self.data["product_id"].unique().tolist()
+        """Return product ids - Thread safe."""
+        with self.data_lock:
+            if self.data is None:
+                raise ValueError("Data not loaded yet")
+            return self.data["product_id"].unique().tolist()
 
     def build_empty_sample(self, user_id, product_id):
-        """Tạo sample giả với buy_times, click_times, rating = 0 nếu chưa có tương tác."""
-        user_df = self.firebaseData.get("users")
-        item_df = self.firebaseData.get("items")
-        seller_df = self.firebaseData.get("sellers")
+        """Tạo sample giả với buy_times, click_times, rating = 0 nếu chưa có tương tác - Thread safe."""
+        # Thread-safe access to firebase data
+        with self.data_lock:
+            user_df = self.firebaseData.get("users")
+            item_df = self.firebaseData.get("items")
+            seller_df = self.firebaseData.get("sellers")
+            
+            if user_df is None or item_df is None or seller_df is None:
+                raise ValueError("Firebase data not loaded properly")
 
-        # Lấy thông tin user
-        user_row = user_df[user_df["id"] == user_id]
-        if user_row.empty:
-            raise ValueError(f"User ID {user_id} not found")
-        user_row = user_row.iloc[0]
+            # Lấy thông tin user
+            user_row = user_df[user_df["id"] == user_id]
+            if user_row.empty:
+                raise ValueError(f"User ID {user_id} not found")
+            user_row = user_row.iloc[0]
+
+            # Lấy thông tin item
+            item_row = item_df[item_df["id"] == product_id]
+            if item_row.empty:
+                raise ValueError(f"Product ID {product_id} not found")
+            item_row = item_row.iloc[0]
+
+            # Lấy location từ seller
+            seller_row = seller_df[seller_df["seller_id"] == item_row["seller_id"]]
+            location = seller_row["seller_location"].values[0] if not seller_row.empty else "unknown"
 
         # Tính age_range
         current_year = datetime.now().year
@@ -281,12 +312,6 @@ class DataManager:
         else:
             age_range = "50+"
 
-        # Lấy thông tin item
-        item_row = item_df[item_df["id"] == product_id]
-        if item_row.empty:
-            raise ValueError(f"Product ID {product_id} not found")
-        item_row = item_row.iloc[0]
-
         # Tính price_range
         price = item_row["price"]
         if price <= 200000:
@@ -299,10 +324,6 @@ class DataManager:
             price_range = "premium"
         else:
             price_range = "flagship"
-
-        # Lấy location từ seller
-        seller_row = seller_df[seller_df["seller_id"] == item_row["seller_id"]]
-        location = seller_row["seller_location"].values[0] if not seller_row.empty else "unknown"
 
         sample = {
             "user_id": user_id,

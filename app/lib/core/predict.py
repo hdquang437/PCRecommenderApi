@@ -1,6 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+import threading
 from .data_manager import DataManager
 from .model_manager import ModelManager
 
@@ -10,17 +11,23 @@ data_manager = DataManager()
 
 # Load model sau khi data manager đã được preprocessing
 model = None
+model_lock = threading.Lock()  # Lock cho model loading
 
 def _ensure_model_loaded():
-    """Đảm bảo model được load với vocab_sizes đúng"""
+    """Đảm bảo model được load với vocab_sizes đúng - Thread safe"""
     global model
-    if model is None:
-        # Đảm bảo data đã được load và preprocess
-        if data_manager.data is None:
-            raise ValueError("Data must be loaded before loading model")
+    if model is not None:
+        return model
         
-        vocab_sizes = data_manager.get_vocab_sizes()
-        model = model_manager.load_model(vocab_sizes=vocab_sizes)
+    with model_lock:  # Thread-safe model loading
+        if model is None:  # Double-check locking
+            # Đảm bảo data đã được load và preprocess
+            if data_manager.data is None:
+                raise ValueError("Data must be loaded before loading model")
+            
+            vocab_sizes = data_manager.get_vocab_sizes()
+            model = model_manager.load_model(vocab_sizes=vocab_sizes)
+            print("Model loaded successfully in thread-safe manner")
     return model
 
 
@@ -114,34 +121,41 @@ def get_user_behavior_for_similar_products(user_id, target_product_id):
 def predict(user_id, product_id):
     """Dự đoán khả năng user mua sản phẩm, ngay cả khi chưa từng tương tác với nó."""
     try:
-        model = _ensure_model_loaded()  # Đảm bảo model được load
-        data = data_manager.get_data()
+        model = _ensure_model_loaded()  # Đảm bảo model được load (thread-safe)
         
-        if data is None or data.empty:
-            raise ValueError("No data available for prediction")
-        
-        sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)]
+        # Thread-safe data access
+        with data_manager.data_lock:
+            data = data_manager.get_data()
+            
+            if data is None or data.empty:
+                raise ValueError("No data available for prediction")
+            
+            # Tạo copy để tránh modify shared data
+            sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)].copy()
 
         if not sample.empty:
             # Dữ liệu có sẵn, thực hiện dự đoán
             sample_dict = dict(sample.iloc[0])
             sample_dict.pop("label", None)  # Loại bỏ nhãn
-            sample_dict.pop("user_id", None)  # Không cần user_id khi đưa vào model
-            sample_dict.pop("product_id", None)  # Không cần product_id khi đưa vào model
+            sample_dict.pop("user_id", None)  # Không cần user_id khi đưa vào model            sample_dict.pop("product_id", None)  # Không cần product_id khi đưa vào model
             
             sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
             
-            prediction = model.predict(sample_ds)
+            # Thread-safe model prediction
+            with model_lock:
+                prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
             print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
             return prediction[0][0]
 
         print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}")
 
-        # Tạo sample cho user chưa tương tác
-        sample_dict = data_manager.build_empty_sample(user_id, product_id)
-        
-        # Mã hóa categorical fields trước khi tạo dataset
-        sample_encoded = data_manager.encode_sample(sample_dict)
+        # Thread-safe sample building
+        with data_manager.data_lock:
+            # Tạo sample cho user chưa tương tác
+            sample_dict = data_manager.build_empty_sample(user_id, product_id)
+            
+            # Mã hóa categorical fields trước khi tạo dataset
+            sample_encoded = data_manager.encode_sample(sample_dict)
         
         # Loại bỏ các trường không cần thiết cho model
         sample_for_model = sample_encoded.copy()
@@ -150,7 +164,10 @@ def predict(user_id, product_id):
         sample_for_model.pop("product_id", None)
         
         sample_ds = tf.data.Dataset.from_tensors(sample_for_model).batch(1)
-        prediction = model.predict(sample_ds)
+        
+        # Thread-safe model prediction
+        with model_lock:
+            prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
         return prediction[0][0]
         
@@ -181,23 +198,36 @@ def predict(user_id, product_id):
     # return prediction[0][0]
 
 def get_top_popular_products(n=10):
-    """Tìm n sản phẩm phổ biến nhất dựa trên dữ liệu thực tế."""
-    data = data_manager.get_data()
-    
-    popular_products = data.groupby("product_id").agg(
-        total_rating=("rating", "sum"),
-        total_clicks=("click_times", "sum"),
-        total_buys=("buy_times", "sum")
-    ).reset_index()
+    """Tìm n sản phẩm phổ biến nhất dựa trên dữ liệu thực tế - Thread safe."""
+    try:
+        # Thread-safe data access
+        with data_manager.data_lock:
+            data = data_manager.get_data()
+            
+            if data is None or data.empty:
+                print("Warning: No data available for popular products")
+                return []
+            
+            # Tạo copy để tránh modify shared data
+            data_copy = data.copy()
+        
+        popular_products = data_copy.groupby("product_id").agg(
+            total_rating=("rating", "sum"),
+            total_clicks=("click_times", "sum"),
+            total_buys=("buy_times", "sum")
+        ).reset_index()
 
-    # Tính điểm tổng hợp (có thể điều chỉnh trọng số)
-    popular_products["popularity_score"] = (
-        popular_products["total_rating"] * 0.5 +
-        popular_products["total_clicks"] * 0.1 +
-        popular_products["total_buys"] * 0.4
-    )
+        # Tính điểm tổng hợp (có thể điều chỉnh trọng số)
+        popular_products["popularity_score"] = (
+            popular_products["total_rating"] * 0.5 +
+            popular_products["total_clicks"] * 0.1 +
+            popular_products["total_buys"] * 0.4
+        )
 
-    # Sắp xếp theo độ phổ biến
-    top_products = popular_products.sort_values(by="popularity_score", ascending=False)["product_id"].head(n).tolist()
-    
-    return top_products
+        # Sắp xếp theo độ phổ biến
+        top_products = popular_products.sort_values(by="popularity_score", ascending=False)["product_id"].head(n).tolist()
+        
+        return top_products
+    except Exception as e:
+        print(f"Error getting top popular products: {e}")
+        return []
