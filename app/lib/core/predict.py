@@ -8,9 +8,20 @@ from .model_manager import ModelManager
 model_manager = ModelManager()
 data_manager = DataManager()
 
+# Load model sau khi data manager đã được preprocessing
+model = None
 
-# Load mô hình
-model = model_manager.load_model()
+def _ensure_model_loaded():
+    """Đảm bảo model được load với vocab_sizes đúng"""
+    global model
+    if model is None:
+        # Đảm bảo data đã được load và preprocess
+        if data_manager.data is None:
+            raise ValueError("Data must be loaded before loading model")
+        
+        vocab_sizes = data_manager.get_vocab_sizes()
+        model = model_manager.load_model(vocab_sizes=vocab_sizes)
+    return model
 
 
 def find_similar_products(target_product_id):
@@ -102,34 +113,50 @@ def get_user_behavior_for_similar_products(user_id, target_product_id):
 
 def predict(user_id, product_id):
     """Dự đoán khả năng user mua sản phẩm, ngay cả khi chưa từng tương tác với nó."""
-    data = data_manager.get_data()
-    
-    sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)]
+    try:
+        model = _ensure_model_loaded()  # Đảm bảo model được load
+        data = data_manager.get_data()
+        
+        if data is None or data.empty:
+            raise ValueError("No data available for prediction")
+        
+        sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)]
 
-    if not sample.empty:
-        # Dữ liệu có sẵn, thực hiện dự đoán
-        sample_dict = dict(sample.iloc[0])
-        sample_dict.pop("label")  # Loại bỏ nhãn
-        sample_dict.pop("user_id")  # Không cần user_id khi đưa vào model
-        sample_dict.pop("product_id")  # Không cần product_id khi đưa vào model
+        if not sample.empty:
+            # Dữ liệu có sẵn, thực hiện dự đoán
+            sample_dict = dict(sample.iloc[0])
+            sample_dict.pop("label", None)  # Loại bỏ nhãn
+            sample_dict.pop("user_id", None)  # Không cần user_id khi đưa vào model
+            sample_dict.pop("product_id", None)  # Không cần product_id khi đưa vào model
+            
+            sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
+            
+            prediction = model.predict(sample_ds)
+            print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
+            return prediction[0][0]
 
-        sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
-        # print(sample_ds)
+        print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}")
 
+        # Tạo sample cho user chưa tương tác
+        sample_dict = data_manager.build_empty_sample(user_id, product_id)
+        
+        # Mã hóa categorical fields trước khi tạo dataset
+        sample_encoded = data_manager.encode_sample(sample_dict)
+        
+        # Loại bỏ các trường không cần thiết cho model
+        sample_for_model = sample_encoded.copy()
+        sample_for_model.pop("label", None)
+        sample_for_model.pop("user_id", None)
+        sample_for_model.pop("product_id", None)
+        
+        sample_ds = tf.data.Dataset.from_tensors(sample_for_model).batch(1)
         prediction = model.predict(sample_ds)
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
         return prediction[0][0]
-
-    print(f"User {user_id} chưa từng tương tác với sản phẩm {product_id}")
-
-    sample_dict = data_manager.build_empty_sample(user_id, product_id)
-    # Mã hóa categorical fields trước khi tạo dataset
-    sample_encoded = data_manager.encode_sample(sample_dict)
-    sample_ds = tf.data.Dataset.from_tensors(sample_encoded).batch(1)
-    # print(sample_ds)
-    prediction = model.predict(sample_ds)
-    print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
-    return prediction[0][0]
+        
+    except Exception as e:
+        print(f"Error in predict function for user {user_id}, product {product_id}: {e}")
+        return -1.0  # Return negative value to indicate error
 
     # # Lấy thông tin từ sản phẩm tương tự user đã từng xem/mua
     # user_behavior = get_user_behavior_for_similar_products(user_id, product_id)

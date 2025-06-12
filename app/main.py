@@ -20,40 +20,64 @@ def read_root():
 
 @app.get("/recommend")
 async def recommend(uid: str, max: int):
-    recommendations = []
-    
-    product_ids = data_manager.get_product_ids()
-    top_k = min(max, len(product_ids))
+    try:
+        # Đảm bảo data đã được load
+        if data_manager.data is None:
+            await data_manager.load_data()
+            data_manager.preprocess_data()
+            
+        recommendations = []
+        
+        product_ids = data_manager.get_product_ids()
+        top_k = min(max, len(product_ids))
 
-    for product_id in product_ids:
-        score = predict(uid, product_id)
-        if score >= 0:  # Chỉ lấy những dự đoán hợp lệ
-            recommendations.append((product_id, score))
-    
-    # Sắp xếp theo xác suất cao nhất
-    recommendations.sort(key=lambda x: x[1], reverse=True)
-    
-    # Lấy top 20 sản phẩm
-    top_products = [prod[0] for prod in recommendations[:top_k]]
-    
-    # Nếu chưa đủ 20 sản phẩm, lấy các sản phẩm phổ biến nhất
-    if len(top_products) < top_k:
-        popular_products = get_top_popular_products(top_k - len(top_products))
-        top_products = top_products + popular_products
+        for product_id in product_ids:
+            try:
+                score = predict(uid, product_id)
+                if score >= 0:  # Chỉ lấy những dự đoán hợp lệ
+                    recommendations.append((product_id, score))
+            except Exception as e:
+                print(f"Error predicting for product {product_id}: {e}")
+                continue
+        
+        # Sắp xếp theo xác suất cao nhất
+        recommendations.sort(key=lambda x: x[1], reverse=True)
+        
+        # Lấy top k sản phẩm
+        top_products = [prod[0] for prod in recommendations[:top_k]]
+        
+        # Nếu chưa đủ k sản phẩm, lấy các sản phẩm phổ biến nhất
+        if len(top_products) < top_k:
+            try:
+                popular_products = get_top_popular_products(top_k - len(top_products))
+                # Loại bỏ duplicate
+                for prod in popular_products:
+                    if prod not in top_products and len(top_products) < top_k:
+                        top_products.append(prod)
+            except Exception as e:
+                print(f"Error getting popular products: {e}")
 
-    return {"products": top_products}
+        return {"products": top_products}
+    except Exception as e:
+        print(f"Error in recommend endpoint: {e}")
+        return {"error": str(e), "products": []}
 
 @app.post("/build")
 async def build():
     print("Building!")
     try:
+        # Đảm bảo data đã được load trước khi train
+        if data_manager.data is None:
+            await data_manager.load_data()
+            data_manager.preprocess_data()
+            
         train_model()
         print("Build done!")
         return {"message": "Build successfully"}
     except Exception as e:
         print("Build failed with error: ")
         print(e)
-        return {"message": e}
+        return {"message": str(e), "error": True}
 
 
 # Hàm build lại model theo chu kỳ
@@ -84,9 +108,14 @@ def periodic_train_model(interval, model_rebuild_function):
 
 
 @app.on_event("startup")
-# Hàm khởi động thread xây dựng lại mô hình
 async def init():
-    await data_manager.load_data(True)
-    data_manager.preprocess_data()
-    data_manager.start_streams()
-    os.environ["TF_DATA_AUTOTUNE_RAM_budget"] = "104857600"  # 100 MB
+    try:
+        print("Starting up application...")
+        await data_manager.load_data(True)
+        data_manager.preprocess_data()
+        data_manager.start_streams()
+        os.environ["TF_DATA_AUTOTUNE_RAM_budget"] = "104857600"  # 100 MB
+        print("Application startup completed!")
+    except Exception as e:
+        print(f"Error during startup: {e}")
+        # Không raise exception để app vẫn có thể start, nhưng log lỗi

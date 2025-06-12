@@ -3,7 +3,8 @@ import tensorflow_recommenders as tfrs
 from tensorflow import keras
 from keras import layers
 
-vocab_sizes = {
+# Default vocab sizes - sẽ được override bởi DataManager
+default_vocab_sizes = {
     "type": 30,
     "location": 63,
     "gender": 2,
@@ -12,8 +13,14 @@ vocab_sizes = {
 }
 
 class WideAndDeepModel(tfrs.Model):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, vocab_sizes=None, *args, **kwargs):
         super(WideAndDeepModel, self).__init__(*args, **kwargs)
+
+        # Sử dụng vocab_sizes được truyền vào hoặc default
+        if vocab_sizes is None:
+            vocab_sizes = default_vocab_sizes
+        
+        self.vocab_sizes = vocab_sizes
 
         def get_output_dim(input_dim):
             return min(50, round(input_dim ** 0.25 * 4))

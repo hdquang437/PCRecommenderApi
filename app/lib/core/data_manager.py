@@ -1,4 +1,7 @@
 import asyncio
+import json
+import os
+import threading
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
@@ -9,8 +12,6 @@ from ...lib.models.item_repository import ItemRepository
 from ...lib.models.user_repository import UserRepository
 from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
-import os
-import json
 
 class DataManager:
     _instance = None  # Biến lưu instance duy nhất của class
@@ -22,23 +23,40 @@ class DataManager:
             cls._instance.dataset = None
             cls._instance.firebaseData = {}
             cls._instance.listeners = []
+            cls._instance.is_local_deployment = False  # Flag để kiểm tra local deployment
+            cls._instance.reload_timer = None  # Timer cho debouncing
+            cls._instance.reload_pending = False  # Flag để kiểm tra reload đang pending
+            
             # Kiểm tra nếu chưa được khởi tạo
             if not firebase_admin._apps:
-                # cred = credentials.Certificate(FIREBASE_KEY_PATH)
-                # firebase_admin.initialize_app(cred)
-                firebase_cred_json = os.getenv("FIREBASE_KEY_JSON")
-                cred_dict = json.loads(firebase_cred_json)
-
-                # cred = credentials.Certificate("./firebase_key.json")
-                cred = credentials.Certificate(cred_dict)
-                firebase_admin.initialize_app(cred)
+                try:
+                    # Thử sử dụng file Firebase key trước
+                    cred = credentials.Certificate(FIREBASE_KEY_PATH)
+                    firebase_admin.initialize_app(cred)
+                    cls._instance.is_local_deployment = True  # Đang chạy local
+                    print(f"Firebase initialized with key file: {FIREBASE_KEY_PATH}")
+                except Exception as e:
+                    print(f"Failed to load Firebase key from file: {e}")
+                    try:
+                        # Fallback: sử dụng environment variable
+                        firebase_cred_json = os.getenv("FIREBASE_KEY_JSON")
+                        if firebase_cred_json:
+                            cred_dict = json.loads(firebase_cred_json)
+                            cred = credentials.Certificate(cred_dict)
+                            firebase_admin.initialize_app(cred)
+                            cls._instance.is_local_deployment = False  # Đang chạy production
+                            print("Firebase initialized with environment variable FIREBASE_KEY_JSON")
+                        else:
+                            raise ValueError("Both FIREBASE_KEY_PATH file and FIREBASE_KEY_JSON environment variable are unavailable")
+                    except Exception as env_error:
+                        raise ValueError(f"Failed to initialize Firebase: {env_error}")
             
             cls.loop = asyncio.get_event_loop()
 
         return cls._instance
 
     def start_streams(self):
-        """Bắt đầu lắng nghe thay đổi từ Firestore"""
+        """Bắt đầu lắng nghe thay đổi từ Firestore với debounced reload"""
         print("Starting Firestore stream listeners...")
 
         user_repo = UserRepository()
@@ -46,12 +64,43 @@ class DataManager:
         interaction_repo = InteractionRepository()
         shop_repo = ShopRepository()
 
-        self.listeners.append(user_repo.listen(self._on_change))
-        self.listeners.append(item_repo.listen(self._on_change))
-        self.listeners.append(interaction_repo.listen(self._on_change))
-        self.listeners.append(shop_repo.listen(self._on_change))
+        # Tạo wrapper function để merge tất cả các changes
+        def merged_change_handler(collection_name):
+            def handler(docs, changes, read_time):
+                print(f"Change detected in {collection_name} collection")
+                self._schedule_debounced_reload()
+            return handler
+
+        self.listeners.append(user_repo.listen(merged_change_handler("users")))
+        self.listeners.append(item_repo.listen(merged_change_handler("items")))
+        self.listeners.append(interaction_repo.listen(merged_change_handler("interactions")))
+        self.listeners.append(shop_repo.listen(merged_change_handler("shops")))
+
+    def _schedule_debounced_reload(self):
+        """Schedule reload với debouncing để tránh reload nhiều lần liên tiếp"""
+        # Hủy timer cũ nếu có
+        if self.reload_timer:
+            self.reload_timer.cancel()
+        
+        # Tạo timer mới - chờ 2 giây trước khi reload
+        self.reload_timer = threading.Timer(2.0, self._execute_reload)
+        self.reload_timer.start()
+        
+        if not self.reload_pending:
+            self.reload_pending = True
+            print("Data reload scheduled (debounced)...")
+            print("Data reload scheduled (debounced)...")
+
+    def _execute_reload(self):
+        """Thực hiện reload data"""
+        if self.reload_pending:
+            print("Executing debounced data reload...")
+            self.reload_pending = False
+            self.reload_timer = None
+            self.loop.call_soon_threadsafe(asyncio.create_task, self._handle_reload())
 
     def _on_change(self, docs, changes, read_time):
+        """Legacy method - kept for compatibility"""
         print("Change detected, reloading data...")
         self.loop.call_soon_threadsafe(asyncio.create_task, self._handle_reload())
 
@@ -137,13 +186,20 @@ class DataManager:
             self.data.rename(columns={
                 "item_id": "product_id",
                 "item_type": "type",
-                "seller_location": "location",
-            }, inplace=True)
-
+                "seller_location": "location",            }, inplace=True)
+            
             # Tạo label
             self.data["label"] = self.data["click_times"].apply(lambda x: 1.0 if x > 0 else 0.0)
-
+            
             self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 3.0}, inplace=True)
+            
+            # Export Firebase data to CSV files for analysis (chỉ khi local deployment)
+            if self.is_local_deployment:
+                self._export_firebase_data_to_csv()
+                print("CSV export completed for local deployment")
+            else:
+                print("Skipping CSV export - running in production mode")
+            
             print("Data loaded!")
             # print(self.data)
 
@@ -151,6 +207,15 @@ class DataManager:
         """Tiền xử lý dữ liệu thành TensorFlow dataset."""
         if self.dataset is None or reload:
             print("Preprocessing dataset...")
+
+            # Lưu category mappings TRƯỚC KHI convert thành numeric codes
+            self.category_mappings = {
+                "gender": list(self.data["gender"].astype("category").cat.categories),
+                "age_range": list(self.data["age_range"].astype("category").cat.categories),
+                "type": list(self.data["type"].astype("category").cat.categories),
+                "price_range": list(self.data["price_range"].astype("category").cat.categories),
+                "location": list(self.data["location"].astype("category").cat.categories),
+            }
 
             # Chuyển đổi categorical thành số
             self.data["gender"] = self.data["gender"].astype("category").cat.codes
@@ -163,14 +228,6 @@ class DataManager:
             self.data["buy_times"] = self.data["buy_times"].astype(float)
             self.data["rating"] = self.data["rating"].astype(float)
             self.data["label"] = self.data["label"].astype(float)
-
-            self.category_mappings = {
-                "gender": list(self.data["gender"].astype("category").cat.categories),
-                "age_range": list(self.data["age_range"].astype("category").cat.categories),
-                "type": list(self.data["type"].astype("category").cat.categories),
-                "price_range": list(self.data["price_range"].astype("category").cat.categories),
-                "location": list(self.data["location"].astype("category").cat.categories),
-            }
 
             # Tạo TensorFlow dataset
 
@@ -280,8 +337,9 @@ class DataManager:
             if val in categories:
                 sample_encoded[col] = categories.index(val)
             else:
-                # Nếu giá trị không có trong danh sách category, có thể gán -1 hoặc 0 tùy mục đích
-                sample_encoded[col] = -1
+                # Gán 0 cho unknown category (thay vì -1 để tránh out-of-bounds)
+                print(f"Warning: Unknown category '{val}' for field '{col}', using default value 0")
+                sample_encoded[col] = 0
 
         # Đảm bảo các trường số là float
         sample_encoded["click_times"] = float(sample_encoded["click_times"])
@@ -289,3 +347,63 @@ class DataManager:
         sample_encoded["rating"] = float(sample_encoded["rating"])
 
         return sample_encoded
+    
+    def get_vocab_sizes(self):
+        """Trả về kích thước vocabulary cho từng categorical field"""
+        if not hasattr(self, 'category_mappings') or self.category_mappings is None:
+            raise ValueError("Category mappings not initialized. Please call preprocess_data() first.")
+        
+        vocab_sizes = {}
+        for field, categories in self.category_mappings.items():
+            vocab_sizes[field] = len(categories)
+        
+        return vocab_sizes
+    
+    def _export_firebase_data_to_csv(self):
+        """Export Firebase data to CSV files for easier analysis and debugging"""
+        try:
+            import os
+            
+            # Create export directory if it doesn't exist
+            export_dir = os.path.join(os.path.dirname(__file__), '..', 'firebaseDataLog')
+            os.makedirs(export_dir, exist_ok=True)
+            
+            # Export individual Firebase collections (override existing files)
+            if "users" in self.firebaseData and not self.firebaseData["users"].empty:
+                users_file = os.path.join(export_dir, "users.csv")
+                self.firebaseData["users"].to_csv(users_file, index=False)
+                print(f"Exported users data to: {users_file}")
+            
+            if "items" in self.firebaseData and not self.firebaseData["items"].empty:
+                items_file = os.path.join(export_dir, "items.csv")
+                self.firebaseData["items"].to_csv(items_file, index=False)
+                print(f"Exported items data to: {items_file}")
+            
+            if "interactions" in self.firebaseData and not self.firebaseData["interactions"].empty:
+                interactions_file = os.path.join(export_dir, "interactions.csv")
+                self.firebaseData["interactions"].to_csv(interactions_file, index=False)
+                print(f"Exported interactions data to: {interactions_file}")
+            
+            if "sellers" in self.firebaseData and not self.firebaseData["sellers"].empty:
+                sellers_file = os.path.join(export_dir, "sellers.csv")
+                self.firebaseData["sellers"].to_csv(sellers_file, index=False)
+                print(f"Exported sellers data to: {sellers_file}")
+            
+            # Export the final processed dataset
+            if self.data is not None and not self.data.empty:
+                final_data_file = os.path.join(export_dir, "final_dataset.csv")
+                self.data.to_csv(final_data_file, index=False)
+                print(f"Exported final processed dataset to: {final_data_file}")
+            
+            # Export category mappings as JSON for reference
+            if hasattr(self, 'category_mappings') and self.category_mappings:
+                mappings_file = os.path.join(export_dir, "category_mappings.json")
+                with open(mappings_file, 'w', encoding='utf-8') as f:
+                    import json
+                    json.dump(self.category_mappings, f, indent=2, ensure_ascii=False)
+                print(f"Exported category mappings to: {mappings_file}")
+                
+            print(f"All Firebase data exported to: {export_dir}")
+            
+        except Exception as e:
+            print(f"Error exporting Firebase data to CSV: {str(e)}")

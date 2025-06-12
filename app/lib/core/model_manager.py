@@ -13,7 +13,7 @@ class ModelManager:
             cls._instance.model = None
         return cls._instance
 
-    def load_model(self, reload=False):
+    def load_model(self, vocab_sizes=None, reload=False):
         """Load mô hình từ file hoặc tạo mới nếu chưa có."""
 
         if self.model is None or reload:
@@ -22,7 +22,7 @@ class ModelManager:
                 self.model = tf.keras.models.load_model(MODEL_PATH, custom_objects={"WideAndDeepModel": WideAndDeepModel})
             else:
                 print("Creating new model...")
-                self.model = WideAndDeepModel()
+                self.model = WideAndDeepModel(vocab_sizes=vocab_sizes)
                 self.model.compile(optimizer=tf.keras.optimizers.Adam())
 
         return self.model

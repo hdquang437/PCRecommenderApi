@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 env/
 app/lib/firestore/firebase_key.json
+/app/lib/firebaseDataLog
