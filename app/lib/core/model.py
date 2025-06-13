@@ -3,112 +3,123 @@ import tensorflow_recommenders as tfrs
 from tensorflow import keras
 from keras import layers
 
-# Default vocab sizes - sẽ được override bởi DataManager
-default_vocab_sizes = {
-    "type": 30,
-    "location": 63,
-    "gender": 2,
-    "age_range": 5,
-    "price_range": 5,
-}
-
 class WideAndDeepModel(tfrs.Model):
-    def __init__(self, vocab_sizes=None, *args, **kwargs):
-        super(WideAndDeepModel, self).__init__(*args, **kwargs)
-
-        # Sử dụng vocab_sizes được truyền vào hoặc default
+    def __init__(self, vocab_sizes=None, name="wide_and_deep_model", *args, **kwargs):
+        super(WideAndDeepModel, self).__init__(name=name, *args, **kwargs)
+        
         if vocab_sizes is None:
-            vocab_sizes = default_vocab_sizes
+            vocab_sizes = {
+                "type": 30, "location": 63, "gender": 2,
+                "age_range": 5, "price_range": 5,
+            }
         
         self.vocab_sizes = vocab_sizes
 
-        def get_output_dim(input_dim):
-            return min(50, round(input_dim ** 0.25 * 4))
+        # Embeddings cho Deep part - REDUCED DIMENSIONS
+        self.type_embedding = layers.Embedding(
+            input_dim=vocab_sizes["type"], output_dim=4, name="type_embedding"
+        )
+        self.location_embedding = layers.Embedding(
+            input_dim=vocab_sizes["location"], output_dim=4, name="location_embedding"
+        )
+        self.gender_embedding = layers.Embedding(
+            input_dim=vocab_sizes["gender"], output_dim=2, name="gender_embedding"
+        )
+        self.age_embedding = layers.Embedding(
+            input_dim=vocab_sizes["age_range"], output_dim=2, name="age_embedding"
+        )
+        self.price_embedding = layers.Embedding(
+            input_dim=vocab_sizes["price_range"], output_dim=2, name="price_embedding"
+        )
 
-        # Embedding layers cho categorical features
-        self.type_embedding = layers.Embedding(input_dim=vocab_sizes["type"], output_dim=get_output_dim(vocab_sizes["type"]))
-        self.location_embedding = layers.Embedding(input_dim=vocab_sizes["location"], output_dim=get_output_dim(vocab_sizes["location"]))
-        self.gender_embedding = layers.Embedding(input_dim=vocab_sizes["gender"], output_dim=get_output_dim(vocab_sizes["gender"]))
-        self.age_embedding = layers.Embedding(input_dim=vocab_sizes["age_range"], output_dim=get_output_dim(vocab_sizes["age_range"]))
-        self.price_embedding = layers.Embedding(input_dim=vocab_sizes["price_range"], output_dim=get_output_dim(vocab_sizes["price_range"]))
+        # Wide component - Linear layer
+        self.wide = layers.Dense(1, activation='linear', use_bias=True, name="wide_layer")
 
-        # Mô hình Wide (tuyến tính)
-        self.wide = keras.Sequential([
-            layers.BatchNormalization(),  # Thêm bước chuẩn hóa trước
-            layers.Dense(1, activation='linear')
-        ])
-
-        # Mô hình Deep (MLP)
+        # Deep component - MUCH SMALLER với heavy regularization
         self.deep = keras.Sequential([
-            layers.Dense(128, activation="relu"),
-            layers.Dense(64, activation="relu"),
-            layers.Dense(32, activation="relu"),
-            layers.Dense(1, activation="sigmoid")
-        ])
+            layers.Dense(16, activation="relu", name="deep_dense_1",
+                        kernel_regularizer=tf.keras.regularizers.l2(0.01)),
+            layers.Dropout(0.8, name="deep_dropout_1"),
+            layers.Dense(8, activation="relu", name="deep_dense_2",
+                        kernel_regularizer=tf.keras.regularizers.l2(0.01)), 
+            layers.Dropout(0.8, name="deep_dropout_2"),
+            layers.Dense(1, activation='linear', name="deep_output")
+        ], name="deep_network")
 
-        self.task = tfrs.tasks.Ranking(loss=tf.keras.losses.BinaryCrossentropy())
+        self.task = tfrs.tasks.Ranking(
+            loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+            name="ranking_task"
+        )
 
-    def call(self, features):
-
-        # Xử lý feature số (dùng cho cả Wide & Deep)
+    def call(self, features, training=None):
+        if isinstance(features, tuple):
+            features, _ = features
+            
+        # Numerical features với normalization
         numerical_features = tf.concat([
             tf.reshape(tf.cast(features["click_times"], tf.float32), (-1, 1)),
             tf.reshape(tf.cast(features["buy_times"], tf.float32), (-1, 1)),
             tf.reshape(tf.cast(features["rating"], tf.float32), (-1, 1))
         ], axis=1)
+        
+        # Simple normalization để tránh extreme values
+        numerical_features = tf.clip_by_value(numerical_features, 0.0, 10.0) / 10.0
 
-        # Lấy embeddings cho categorical features
-        type_embedded = self.type_embedding(tf.cast(features["type"], tf.int32))
-        location_embedded = self.location_embedding(tf.cast(features["location"], tf.int32))
-        gender_embedded = self.gender_embedding(tf.cast(features["gender"], tf.int32))
-        age_embedded = self.age_embedding(tf.cast(features["age_range"], tf.int32))
-        price_embedded = self.price_embedding(tf.cast(features["price_range"], tf.int32))
+        # One-hot cho Wide part
+        type_indices = tf.reshape(tf.cast(features["type"], tf.int32), [-1])
+        location_indices = tf.reshape(tf.cast(features["location"], tf.int32), [-1])
+        gender_indices = tf.reshape(tf.cast(features["gender"], tf.int32), [-1])
+        age_indices = tf.reshape(tf.cast(features["age_range"], tf.int32), [-1])
+        price_indices = tf.reshape(tf.cast(features["price_range"], tf.int32), [-1])
 
-        # deep_input = tf.concat([
-        #     tf.reshape(gender_embedded, (-1, 4)),  
-        #     tf.reshape(age_embedded, (-1, 4)),
-        #     tf.reshape(type_embedded, (-1, 8)),  
-        #     tf.reshape(price_embedded, (-1, 4)), 
-        #     tf.reshape(location_embedded, (-1, 8)),     
-        #     numerical_features  # Dùng feature số cho cả Deep Model
-        # ], axis=1)
+        type_onehot = tf.one_hot(type_indices, self.vocab_sizes["type"])
+        location_onehot = tf.one_hot(location_indices, self.vocab_sizes["location"])
+        gender_onehot = tf.one_hot(gender_indices, self.vocab_sizes["gender"])
+        age_onehot = tf.one_hot(age_indices, self.vocab_sizes["age_range"])
+        price_onehot = tf.one_hot(price_indices, self.vocab_sizes["price_range"])
 
-        deep_input = tf.concat([
-            gender_embedded,
-            age_embedded,
-            type_embedded,
-            price_embedded,
-            location_embedded,
+        # Wide input: SIMPLE concatenation, no cross products để tránh overfitting
+        wide_input = tf.concat([
+            type_onehot, location_onehot, gender_onehot, age_onehot, price_onehot,
             numerical_features
         ], axis=1)
 
-        # Wide Model (Dùng trực tiếp feature số)
-        wide_output = self.wide(numerical_features)
-        deep_output = self.deep(deep_input)
+        # Embeddings cho Deep part - SMALLER
+        type_embedded = self.type_embedding(type_indices)
+        location_embedded = self.location_embedding(location_indices)
+        gender_embedded = self.gender_embedding(gender_indices)
+        age_embedded = self.age_embedding(age_indices)
+        price_embedded = self.price_embedding(price_indices)
 
-        # In giá trị để debug
-        # tf.print("Wide output:", wide_output)
-        # tf.print("Deep output:", deep_output)
+        # Deep input
+        deep_input = tf.concat([
+            tf.reshape(gender_embedded, [-1, 2]),
+            tf.reshape(age_embedded, [-1, 2]),
+            tf.reshape(type_embedded, [-1, 4]),
+            tf.reshape(price_embedded, [-1, 2]),
+            tf.reshape(location_embedded, [-1, 4]),
+            numerical_features
+        ], axis=1)
 
-        output = tf.nn.sigmoid(tf.cast(wide_output + deep_output, tf.float32))
+        # Forward pass
+        wide_output = self.wide(wide_input)
+        deep_output = self.deep(deep_input, training=training)
+
+        # MORE AGGRESSIVE combination
+        combined_output = 0.2 * wide_output + 0.8 * deep_output
+        
+        # Much more aggressive temperature
+        output = tf.nn.sigmoid(combined_output / 0.5)  # Temperature = 0.5 (very aggressive)
 
         return output
     
     def compute_loss(self, features, training=False):
-        """Tính toán loss dựa trên đầu ra của model và label thực tế."""
-
-        inputs, labels = features  # Giải nén tuple
-
+        inputs, labels = features
         labels = tf.cast(labels, tf.float32)
-        predictions = self.call(inputs)
-        return self.task(labels=labels, predictions=predictions)
-    
-    def get_config(self):
-        """Trả về config khi lưu model."""
-        config = super(WideAndDeepModel, self).get_config()
-        return config
-
-    @classmethod
-    def from_config(cls, config):
-        """Tạo lại model từ config"""
-        return cls(**config)
+        labels = tf.reshape(labels, [-1, 1])
+        predictions = self.call(inputs, training=training)
+        
+        # Reduce label smoothing để có more confident predictions
+        smoothed_labels = labels * 0.98 + 0.01  # Less smoothing
+        
+        return self.task(labels=smoothed_labels, predictions=predictions)

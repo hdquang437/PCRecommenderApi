@@ -1,44 +1,91 @@
 import tensorflow as tf
+import os
+import shutil
 from .data_manager import DataManager
 from .model_manager import ModelManager
 from tensorflow import keras
 from keras import layers
 
 def train_model():
-  BATCH_SIZE = 32
-  TRAIN_RATIO = 0.8  # 80% train, 20% test
+    BATCH_SIZE = 8
+    TRAIN_RATIO = 0.7
 
-  # Khởi tạo DataManager (Singleton)
-  data_manager = DataManager()
+    try:
+        data_manager = DataManager()
+        data = data_manager.get_data()
+        dataset = data_manager.get_dataset()
 
-  # Lấy dataset
-  data = data_manager.get_data()
-  dataset = data_manager.get_dataset()
+        print(f"Total data size: {len(data)}")
+        
+        if len(data) < 20:
+            return {
+                "status": "error",
+                "error": "Dataset too small (< 20 samples). Need more data to train."
+            }
 
-  print("Data columns:", dataset)
+        train_size = int(TRAIN_RATIO * len(data))
+        test_size = len(data) - train_size
+        
+        print(f"Train size: {train_size}, Test size: {test_size}")
 
-  # Chia train / test
-  train_size = int(TRAIN_RATIO * len(data))
-  train_ds = dataset.take(train_size)
-  test_ds = dataset.skip(train_size)
-  # Khởi tạo ModelManager
-  model_manager = ModelManager()
-  vocab_sizes = data_manager.get_vocab_sizes()
-  model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True)
+        train_ds = dataset.take(train_size).batch(BATCH_SIZE)
+        test_ds = dataset.skip(train_size).batch(BATCH_SIZE)
 
-  # Tự động điều chỉnh repeat & steps_per_epoch
-  if train_size > 10000:  # Ngưỡng để quyết định dataset lớn
-    steps_per_epoch = None  # Keras sẽ tự tính nếu None
-  else:
-    train_ds = train_ds.repeat()
-    test_ds = test_ds.repeat()
-    steps_per_epoch = max(1, train_size // BATCH_SIZE)
-  # Train mô hình
-  model.fit(train_ds, epochs=10, validation_data=test_ds, steps_per_epoch=steps_per_epoch)
+        # ===== FORCE CLEAN REBUILD =====
+        model_manager = ModelManager()
+        vocab_sizes = data_manager.get_vocab_sizes()
+        
+        # Delete old model directory completely
+        model_dir = os.path.join(os.path.dirname(__file__), '..', 'wide_deep_model')
+        if os.path.exists(model_dir):
+            try:
+                shutil.rmtree(model_dir)
+                print(f"Removed old model directory: {model_dir}")
+            except Exception as e:
+                print(f"Warning: Could not remove model dir: {e}")
+        
+        # Force create new model (bypass loading)
+        print("Creating new model from scratch...")
+        model_manager.model = None  # Reset any cached model
+        
+        # Create brand new model
+        model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True, force_new=True)
 
-  # Gọi model trên một batch dữ liệu test trước khi save
-  dummy_input = next(iter(train_ds.take(1)))[0]  # Lấy features
-  model(dummy_input)
+        # Compile with new settings
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            run_eagerly=False
+        )
 
-  # Lưu mô hình
-  model_manager.save_model()
+        # Train model
+        history = model.fit(
+            train_ds, 
+            epochs=3,
+            validation_data=test_ds,
+            verbose=1
+        )
+
+        # Test predictions
+        sample_batch = next(iter(train_ds.take(1)))
+        features, labels = sample_batch
+        predictions = model(features)
+        
+        print(f"Sample predictions range: {predictions.numpy().min():.4f} - {predictions.numpy().max():.4f}")
+        print(f"Sample predictions mean: {predictions.numpy().mean():.4f}")
+
+        # Save new model
+        model_manager.save_model()
+        
+        return {
+            "status": "success",
+            "train_size": train_size,
+            "test_size": test_size,
+            "final_loss": float(history.history['loss'][-1]),
+            "note": "Model rebuilt from scratch with new architecture"
+        }
+
+    except Exception as e:
+        print(f"Training failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "error": str(e)}

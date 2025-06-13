@@ -1,5 +1,5 @@
-import tensorflow as tf
 import os
+import tensorflow as tf
 from .model import WideAndDeepModel
 from ...paths import MODEL_PATH
 
@@ -13,28 +13,49 @@ class ModelManager:
             cls._instance.model = None
         return cls._instance
 
-    def load_model(self, vocab_sizes=None, reload=False):
+    def load_model(self, vocab_sizes=None, reload=False, force_new=False):
         """Load mô hình từ file hoặc tạo mới nếu chưa có."""
 
+        if force_new:
+            # Force create new model, ignore saved version
+            print("Force creating new model...")
+            self.model = WideAndDeepModel(vocab_sizes=vocab_sizes)
+            return self.model
+            
         if self.model is None or reload:
-            if os.path.exists(MODEL_PATH):
-                print("Loading existing model...")
-                self.model = tf.keras.models.load_model(MODEL_PATH, custom_objects={"WideAndDeepModel": WideAndDeepModel})
+            if os.path.exists(MODEL_PATH) and not force_new:
+                try:
+                    print("Loading existing model...")
+                    self.model = tf.keras.models.load_model(
+                        MODEL_PATH, 
+                        custom_objects={"WideAndDeepModel": WideAndDeepModel}
+                    )
+                    print("Model loaded successfully!")
+                except Exception as e:
+                    print(f"Failed to load existing model: {e}")
+                    print("Creating new model...")
+                    self.model = WideAndDeepModel(vocab_sizes=vocab_sizes)
             else:
                 print("Creating new model...")
                 self.model = WideAndDeepModel(vocab_sizes=vocab_sizes)
-                self.model.compile(optimizer=tf.keras.optimizers.Adam())
-
+        
         return self.model
 
     def save_model(self):
         """Lưu mô hình vào file."""
         if self.model is not None:
-            self.model.save(MODEL_PATH)
-            print("Model saved!")
-
+            try:
+                # Create directory if not exists
+                os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+                
+                # Save model
+                self.model.save(MODEL_PATH)
+                print("Model saved!")
+            except Exception as e:
+                print(f"Failed to save model: {e}")
+        else:
+            print("No model to save")
+    
     def get_model(self):
         """Trả về mô hình hiện tại."""
-        if self.model is None:
-            raise ValueError("Model chưa được load. Hãy gọi load_model() trước.")
         return self.model
