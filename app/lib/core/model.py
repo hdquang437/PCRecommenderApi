@@ -63,14 +63,21 @@ class WideAndDeepModel(tfrs.Model):
         ], axis=1)
         
         # Simple normalization để tránh extreme values
-        numerical_features = tf.clip_by_value(numerical_features, 0.0, 10.0) / 10.0
-
-        # One-hot cho Wide part
+        numerical_features = tf.clip_by_value(numerical_features, 0.0, 10.0) / 10.0        # One-hot cho Wide part với SAFE INDEX CLIPPING
         type_indices = tf.reshape(tf.cast(features["type"], tf.int32), [-1])
+        type_indices = tf.clip_by_value(type_indices, 0, self.vocab_sizes["type"] - 1)
+        
         location_indices = tf.reshape(tf.cast(features["location"], tf.int32), [-1])
+        location_indices = tf.clip_by_value(location_indices, 0, self.vocab_sizes["location"] - 1)
+        
         gender_indices = tf.reshape(tf.cast(features["gender"], tf.int32), [-1])
+        gender_indices = tf.clip_by_value(gender_indices, 0, self.vocab_sizes["gender"] - 1)
+        
         age_indices = tf.reshape(tf.cast(features["age_range"], tf.int32), [-1])
+        age_indices = tf.clip_by_value(age_indices, 0, self.vocab_sizes["age_range"] - 1)
+        
         price_indices = tf.reshape(tf.cast(features["price_range"], tf.int32), [-1])
+        price_indices = tf.clip_by_value(price_indices, 0, self.vocab_sizes["price_range"] - 1)
 
         type_onehot = tf.one_hot(type_indices, self.vocab_sizes["type"])
         location_onehot = tf.one_hot(location_indices, self.vocab_sizes["location"])

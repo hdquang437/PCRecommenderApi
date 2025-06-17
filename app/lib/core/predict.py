@@ -129,21 +129,31 @@ def predict(user_id, product_id):
             
             if data is None or data.empty:
                 raise ValueError("No data available for prediction")
-            
-            # Tạo copy để tránh modify shared data
+              # Tạo copy để tránh modify shared data
             sample = data[(data["user_id"] == user_id) & (data["product_id"] == product_id)].copy()
 
         if not sample.empty:
             # Dữ liệu có sẵn, thực hiện dự đoán
             sample_dict = dict(sample.iloc[0])
             sample_dict.pop("label", None)  # Loại bỏ nhãn
-            sample_dict.pop("user_id", None)  # Không cần user_id khi đưa vào model            sample_dict.pop("product_id", None)  # Không cần product_id khi đưa vào model
+            sample_dict.pop("user_id", None)  # Không cần user_id khi đưa vào model
+            sample_dict.pop("product_id", None)  # Không cần product_id khi đưa vào model
             
             sample_ds = tf.data.Dataset.from_tensors(sample_dict).batch(1)
             
             # Thread-safe model prediction
             with model_lock:
-                prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
+                try:
+                    prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
+                except Exception as model_error:
+                    # Check if it's an embedding index error
+                    if "is not in" in str(model_error) and "GatherV2" in str(model_error):
+                        print(f"WARNING: Index out of bounds for user {user_id}, product {product_id}")
+                        print("This might indicate new categorical values not seen during training")
+                        # Return neutral prediction
+                        return 0.5
+                    else:
+                        raise model_error  # Re-raise other errors
             print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
             return prediction[0][0]
 
@@ -156,8 +166,7 @@ def predict(user_id, product_id):
             
             # Mã hóa categorical fields trước khi tạo dataset
             sample_encoded = data_manager.encode_sample(sample_dict)
-        
-        # Loại bỏ các trường không cần thiết cho model
+          # Loại bỏ các trường không cần thiết cho model
         sample_for_model = sample_encoded.copy()
         sample_for_model.pop("label", None)
         sample_for_model.pop("user_id", None)
@@ -167,7 +176,17 @@ def predict(user_id, product_id):
         
         # Thread-safe model prediction
         with model_lock:
-            prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
+            try:
+                prediction = model.predict(sample_ds, verbose=0)  # Tắt verbose để giảm noise
+            except Exception as model_error:
+                # Check if it's an embedding index error
+                if "is not in" in str(model_error) and "GatherV2" in str(model_error):
+                    print(f"WARNING: Index out of bounds for user {user_id}, product {product_id}")
+                    print("This might indicate new categorical values not seen during training")
+                    # Return neutral prediction
+                    return 0.5
+                else:
+                    raise model_error  # Re-raise other errors
         print(f"Xác suất user {user_id} mua {product_id}: {prediction[0][0]:.2%}")
         return prediction[0][0]
         

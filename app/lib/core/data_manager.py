@@ -214,21 +214,19 @@ class DataManager:
         if self.dataset is None or reload:
             print("Preprocessing dataset...")
 
-            # Lưu category mappings TRƯỚC KHI convert thành numeric codes
-            self.category_mappings = {
-                "gender": list(self.data["gender"].astype("category").cat.categories),
-                "age_range": list(self.data["age_range"].astype("category").cat.categories),
-                "type": list(self.data["type"].astype("category").cat.categories),
-                "price_range": list(self.data["price_range"].astype("category").cat.categories),
-                "location": list(self.data["location"].astype("category").cat.categories),
-            }
+            # Load category mappings từ file JSON
+            self._load_category_mappings_from_file()
 
-            # Chuyển đổi categorical thành số
-            self.data["gender"] = self.data["gender"].astype("category").cat.codes
-            self.data["age_range"] = self.data["age_range"].astype("category").cat.codes
-            self.data["type"] = self.data["type"].astype("category").cat.codes
-            self.data["price_range"] = self.data["price_range"].astype("category").cat.codes
-            self.data["location"] = self.data["location"].astype("category").cat.codes
+            # Chuyển đổi categorical thành số sử dụng category_mappings từ file
+            for field in ["gender", "age_range", "type", "price_range", "location"]:
+                if field in self.category_mappings:
+                    categories = self.category_mappings[field]
+                    # Tạo categorical với tất cả categories từ mapping file
+                    self.data[field] = pd.Categorical(self.data[field], categories=categories)
+                    self.data[field] = self.data[field].cat.codes
+                else:
+                    # Fallback nếu không có trong mapping file
+                    self.data[field] = self.data[field].astype("category").cat.codes
 
             self.data["click_times"] = self.data["click_times"].astype(float)
             self.data["buy_times"] = self.data["buy_times"].astype(float)
@@ -360,13 +358,11 @@ class DataManager:
             else:
                 # Gán 0 cho unknown category (thay vì -1 để tránh out-of-bounds)
                 print(f"Warning: Unknown category '{val}' for field '{col}', using default value 0")
-                sample_encoded[col] = 0
-
-        # Đảm bảo các trường số là float
+                sample_encoded[col] = 0        # Đảm bảo các trường số là float
         sample_encoded["click_times"] = float(sample_encoded["click_times"])
         sample_encoded["buy_times"] = float(sample_encoded["buy_times"])
         sample_encoded["rating"] = float(sample_encoded["rating"])
-
+        
         return sample_encoded
     
     def get_vocab_sizes(self):
@@ -377,6 +373,19 @@ class DataManager:
         vocab_sizes = {}
         for field, categories in self.category_mappings.items():
             vocab_sizes[field] = len(categories)
+        
+        # DEBUG: Print actual ranges để debug index out of bounds
+        if self.data is not None:
+            print(f"DEBUG - Vocab sizes: {vocab_sizes}")
+            for field in ["type", "location", "gender", "age_range", "price_range"]:
+                if field in self.data.columns:
+                    field_min = self.data[field].min()
+                    field_max = self.data[field].max()
+                    print(f"DEBUG - {field} range: {field_min} - {field_max} (vocab_size: {vocab_sizes.get(field, 'N/A')})")
+                    
+                    # Check for potential out-of-bounds
+                    if field in vocab_sizes and field_max >= vocab_sizes[field]:
+                        print(f"WARNING - {field} max value {field_max} >= vocab_size {vocab_sizes[field]}!")
         
         return vocab_sizes
     
@@ -409,22 +418,50 @@ class DataManager:
                 sellers_file = os.path.join(export_dir, "sellers.csv")
                 self.firebaseData["sellers"].to_csv(sellers_file, index=False)
                 print(f"Exported sellers data to: {sellers_file}")
-            
-            # Export the final processed dataset
+              # Export the final processed dataset
             if self.data is not None and not self.data.empty:
                 final_data_file = os.path.join(export_dir, "final_dataset.csv")
                 self.data.to_csv(final_data_file, index=False)
                 print(f"Exported final processed dataset to: {final_data_file}")
-            
-            # Export category mappings as JSON for reference
-            if hasattr(self, 'category_mappings') and self.category_mappings:
-                mappings_file = os.path.join(export_dir, "category_mappings.json")
-                with open(mappings_file, 'w', encoding='utf-8') as f:
-                    import json
-                    json.dump(self.category_mappings, f, indent=2, ensure_ascii=False)
-                print(f"Exported category mappings to: {mappings_file}")
                 
             print(f"All Firebase data exported to: {export_dir}")
             
         except Exception as e:
             print(f"Error exporting Firebase data to CSV: {str(e)}")
+    
+    def _load_category_mappings_from_file(self):
+        """Load category mappings từ file JSON"""
+        try:
+            import json
+            import os
+            
+            mappings_file = os.path.join(os.path.dirname(__file__), '..', 'core', 'category_mappings.json')
+            
+            if os.path.exists(mappings_file):
+                with open(mappings_file, 'r', encoding='utf-8') as f:
+                    self.category_mappings = json.load(f)
+                print(f"Loaded category mappings from: {mappings_file}")
+                print(f"Available categories: {list(self.category_mappings.keys())}")
+                for field, categories in self.category_mappings.items():
+                    print(f"  {field}: {len(categories)} categories")
+            else:
+                print(f"Category mappings file not found: {mappings_file}")
+                # Fallback: tạo mappings từ data hiện tại
+                self.category_mappings = {
+                    "gender": list(self.data["gender"].astype("category").cat.categories),
+                    "age_range": list(self.data["age_range"].astype("category").cat.categories),
+                    "type": list(self.data["type"].astype("category").cat.categories),
+                    "price_range": list(self.data["price_range"].astype("category").cat.categories),
+                    "location": list(self.data["location"].astype("category").cat.categories),
+                }
+                
+        except Exception as e:
+            print(f"Error loading category mappings: {str(e)}")
+            # Fallback: tạo mappings từ data hiện tại
+            self.category_mappings = {
+                "gender": list(self.data["gender"].astype("category").cat.categories),
+                "age_range": list(self.data["age_range"].astype("category").cat.categories),
+                "type": list(self.data["type"].astype("category").cat.categories),
+                "price_range": list(self.data["price_range"].astype("category").cat.categories),
+                "location": list(self.data["location"].astype("category").cat.categories),
+            }
