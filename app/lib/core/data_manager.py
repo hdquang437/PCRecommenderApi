@@ -13,6 +13,11 @@ from ...lib.models.user_repository import UserRepository
 from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
 
+# CONSTANTS cho stream data optimization
+RELOAD_DEBOUNCE_DELAY = 3.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
+MAX_RELOAD_DELAY = 60.0     # Thời gian tối đa chờ trước khi buộc phải reload
+IGNORE_CHANGES_DURING_RELOAD = True  # Bỏ qua các thay đổi trong quá trình reload
+
 class DataManager:
     _instance = None  # Biến lưu instance duy nhất của class
     _lock = threading.Lock()  # Lock cho thread safety
@@ -29,6 +34,9 @@ class DataManager:
                     cls._instance.is_local_deployment = False  # Flag để kiểm tra local deployment
                     cls._instance.reload_timer = None  # Timer cho debouncing
                     cls._instance.reload_pending = False  # Flag để kiểm tra reload đang pending
+                    cls._instance.is_reloading = False  # Flag để kiểm tra đang reload
+                    cls._instance.first_reload_time = None  # Thời gian reload đầu tiên được request
+                    cls._instance.changes_ignored_count = 0  # Số lượng changes bị ignore
                     cls._instance.data_lock = threading.RLock()  # Lock cho data operations
                     cls._instance.init_lock = threading.Lock()  # Lock cho initialization
                     cls._instance.is_initializing = False  # Flag cho initialization
@@ -64,17 +72,21 @@ class DataManager:
     def start_streams(self):
         """Bắt đầu lắng nghe thay đổi từ Firestore với debounced reload"""
         print("Starting Firestore stream listeners...")
-
+        
+        # INITIAL LOAD: Load data ngay lập tức khi khởi tạo
+        print("Performing initial data load...")
+        asyncio.create_task(self._handle_initial_load())
+        
         user_repo = UserRepository()
         item_repo = ItemRepository()
         interaction_repo = InteractionRepository()
         shop_repo = ShopRepository()
 
-        # Tạo wrapper function để merge tất cả các changes
+        # Tạo wrapper function để merge tất cả các changes với optimized debouncing
         def merged_change_handler(collection_name):
             def handler(docs, changes, read_time):
                 print(f"Change detected in {collection_name} collection")
-                self._schedule_debounced_reload()
+                self._schedule_optimized_reload(collection_name)
             return handler
 
         self.listeners.append(user_repo.listen(merged_change_handler("users")))
@@ -82,27 +94,60 @@ class DataManager:
         self.listeners.append(interaction_repo.listen(merged_change_handler("interactions")))
         self.listeners.append(shop_repo.listen(merged_change_handler("shops")))
 
-    def _schedule_debounced_reload(self):
-        """Schedule reload với debouncing để tránh reload nhiều lần liên tiếp"""
-        # Hủy timer cũ nếu có
+    def _schedule_optimized_reload(self, collection_name):
+        """Optimized reload scheduling với advanced debouncing"""
+        current_time = datetime.now()
+        
+        # Nếu đang reload, ignore change này
+        if self.is_reloading and IGNORE_CHANGES_DURING_RELOAD:
+            self.changes_ignored_count += 1
+            print(f"Change ignored during reload (collection: {collection_name}, ignored: {self.changes_ignored_count})")
+            return
+        
+        # Nếu chưa có reload nào được schedule
+        if not self.reload_pending:
+            self.reload_pending = True
+            self.first_reload_time = current_time
+            self.changes_ignored_count = 0
+            print(f"First change detected in {collection_name}, scheduling reload in {RELOAD_DEBOUNCE_DELAY}s...")
+        else:
+            # Đã có reload pending, kiểm tra thời gian
+            time_since_first = (current_time - self.first_reload_time).total_seconds()
+            
+            if time_since_first >= MAX_RELOAD_DELAY:
+                # Đã chờ quá lâu, reload ngay lập tức
+                print(f"Max delay reached ({MAX_RELOAD_DELAY}s), forcing reload now...")
+                self._force_execute_reload()
+                return
+            else:
+                # Vẫn trong thời gian chờ, reset timer
+                print(f"Additional change in {collection_name}, resetting timer (total wait: {time_since_first:.1f}s)")
+        
+        # Hủy timer cũ và tạo timer mới
         if self.reload_timer:
             self.reload_timer.cancel()
         
-        # Tạo timer mới - chờ 2 giây trước khi reload
-        self.reload_timer = threading.Timer(2.0, self._execute_reload)
+        self.reload_timer = threading.Timer(RELOAD_DEBOUNCE_DELAY, self._execute_reload)
         self.reload_timer.start()
-        
-        if not self.reload_pending:
-            self.reload_pending = True
-            print("Data reload scheduled (debounced)...")
-            print("Data reload scheduled (debounced)...")
 
+    def _force_execute_reload(self):
+        """Buộc thực hiện reload ngay lập tức"""
+        if self.reload_timer:
+            self.reload_timer.cancel()
+            self.reload_timer = None
+        self._execute_reload()
+
+    def _schedule_debounced_reload(self):
+        """Legacy method - redirect to optimized version"""
+        self._schedule_optimized_reload("unknown")
     def _execute_reload(self):
-        """Thực hiện reload data"""
+        """Thực hiện reload data với optimization"""
         if self.reload_pending:
-            print("Executing debounced data reload...")
+            print(f"Executing optimized data reload... (ignored {self.changes_ignored_count} changes)")
             self.reload_pending = False
             self.reload_timer = None
+            self.is_reloading = True  # Đánh dấu đang reload
+            self.first_reload_time = None
             self.loop.call_soon_threadsafe(asyncio.create_task, self._handle_reload())
 
     def _on_change(self, docs, changes, read_time):
@@ -113,6 +158,16 @@ class DataManager:
     async def _handle_reload(self):
         await self.load_data(reload=True)
         self.preprocess_data(reload=True)
+
+    async def _handle_initial_load(self):
+        """Load data ngay lập tức khi khởi tạo, không cần chờ changes"""
+        try:
+            print("Starting initial data load...")
+            await self.load_data(reload=True)
+            self.preprocess_data(reload=True)
+            print("Initial data load completed successfully!")
+        except Exception as e:
+            print(f"Error during initial data load: {str(e)}")
 
     async def load_data(self, reload=False):
         """Load dữ liệu từ đầu nếu reload=True, nếu không dùng dữ liệu cũ."""

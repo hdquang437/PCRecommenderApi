@@ -51,6 +51,13 @@ class WideAndDeepModel(tfrs.Model):
             name="ranking_task"
         )
 
+    def build(self, input_shape):
+        """Build the model layers."""
+        super(WideAndDeepModel, self).build(input_shape)
+        # Các layers đã được khởi tạo trong __init__, 
+        # method này chỉ để đánh dấu model đã được built
+        self.built = True
+
     def call(self, features, training=None):
         if isinstance(features, tuple):
             features, _ = features
