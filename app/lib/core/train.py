@@ -1,10 +1,21 @@
-import tensorflow as tf
 import os
 import shutil
-from .data_manager import DataManager
-from .model_manager import ModelManager
+import warnings
+
+# Tắt TensorFlow warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+warnings.filterwarnings("ignore")
+
+import tensorflow as tf
 from tensorflow import keras
 from keras import layers
+
+# Cấu hình TensorFlow logging
+tf.get_logger().setLevel('FATAL')
+tf.autograph.set_verbosity(0)
+
+from .data_manager import DataManager
+from .model_manager import ModelManager
 
 def train_model():
     BATCH_SIZE = 8

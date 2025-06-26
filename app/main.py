@@ -2,11 +2,27 @@ import threading
 import time
 import asyncio
 import concurrent.futures
+import os
+import warnings
+
+# Tắt TensorFlow warnings ngay từ đầu
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Chỉ hiện FATAL errors
+os.environ["TF_DATA_AUTOTUNE_RAM_BUDGET"] = "104857600"  # 100 MB
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"  # Tắt oneDNN optimization messages
+os.environ["TF_AUTOTUNE_THRESHOLD"] = "2"
+os.environ["TF_DATA_EXPERIMENTAL_ENABLE_GET_NEXT_AS_OPTIONAL"] = "true"
+
+# Tắt warnings
+warnings.filterwarnings("ignore")
+
 from fastapi import FastAPI, BackgroundTasks
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import os
+
+# Cấu hình TensorFlow logging ngay sau khi import
+tf.get_logger().setLevel('FATAL')
+tf.autograph.set_verbosity(0)
 
 from .lib.core.predict import predict, get_top_popular_products
 from .lib.core.train import train_model
@@ -205,10 +221,29 @@ def periodic_train_model(interval, model_rebuild_function):
 async def init():
     try:
         print("Starting up application...")
+        
+        # Tắt TensorFlow warnings và logs không cần thiết
+        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Chỉ hiện FATAL errors
+        os.environ["TF_DATA_AUTOTUNE_RAM_BUDGET"] = "104857600"  # 100 MB
+        os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"  # Tắt oneDNN optimization messages
+        os.environ["TF_AUTOTUNE_THRESHOLD"] = "2"  # Giảm autotune warnings
+        os.environ["TF_DATA_EXPERIMENTAL_ENABLE_GET_NEXT_AS_OPTIONAL"] = "true"
+        os.environ["CUDA_VISIBLE_DEVICES"] = ""  # Tắt GPU nếu không cần
+        
+        # Tắt các warning khác
+        import warnings
+        warnings.filterwarnings("ignore")
+        warnings.filterwarnings("ignore", category=UserWarning)
+        warnings.filterwarnings("ignore", category=FutureWarning)
+        
+        # Import tensorflow sau khi set environment variables
+        import tensorflow as tf
+        tf.get_logger().setLevel('FATAL')  # Chỉ hiện FATAL errors
+        tf.autograph.set_verbosity(0)  # Tắt autograph verbose
+        
         await data_manager.load_data(True)
         data_manager.preprocess_data()
         data_manager.start_streams()
-        os.environ["TF_DATA_AUTOTUNE_RAM_budget"] = "104857600"  # 100 MB
         print("Application startup completed!")
     except Exception as e:
         print(f"Error during startup: {e}")
@@ -316,19 +351,24 @@ async def get_current_datatable():
         # Lấy data hiện tại từ DataManager
         data = data_manager.get_data()
         
+        # Convert numpy dtypes to string để tránh serialization error
+        data_types_safe = {}
+        for col, dtype in data.dtypes.items():
+            data_types_safe[col] = str(dtype)
+        
         # Chuyển đổi thành format dễ đọc
         result = {
             "status": "success",
             "total_rows": len(data),
             "columns": list(data.columns),
             "data_sample": data.head(10).to_dict('records'),  # 10 rows đầu
-            "data_types": data.dtypes.to_dict(),
+            "data_types": data_types_safe,  # Safe version
             "summary": {
-                "unique_users": data["user_id"].nunique() if "user_id" in data.columns else 0,
-                "unique_products": data["product_id"].nunique() if "product_id" in data.columns else 0,
-                "unique_locations": data["location"].nunique() if "location" in data.columns else 0,
-                "unique_types": data["type"].nunique() if "type" in data.columns else 0,
-                "total_interactions": len(data),
+                "unique_users": int(data["user_id"].nunique()) if "user_id" in data.columns else 0,
+                "unique_products": int(data["product_id"].nunique()) if "product_id" in data.columns else 0,
+                "unique_locations": int(data["location"].nunique()) if "location" in data.columns else 0,
+                "unique_types": int(data["type"].nunique()) if "type" in data.columns else 0,
+                "total_interactions": int(len(data)),
                 "positive_labels": int(data["label"].sum()) if "label" in data.columns else 0
             }
         }

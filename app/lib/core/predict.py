@@ -1,7 +1,19 @@
+import os
+import warnings
+
+# Tắt TensorFlow warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+warnings.filterwarnings("ignore")
+
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 import threading
+
+# Cấu hình TensorFlow logging
+tf.get_logger().setLevel('FATAL')
+tf.autograph.set_verbosity(0)
+
 from .data_manager import DataManager
 from .model_manager import ModelManager
 

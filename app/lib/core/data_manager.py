@@ -2,11 +2,26 @@ import asyncio
 import json
 import os
 import threading
+import warnings
 from datetime import datetime
+
+# Tắt TensorFlow warnings và debug messages
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Chỉ hiện FATAL errors
+os.environ["TF_DATA_AUTOTUNE_RAM_BUDGET"] = "104857600"  # 100 MB
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_AUTOTUNE_THRESHOLD"] = "2"
+
+# Tắt warnings
+warnings.filterwarnings("ignore")
+
 import firebase_admin
 from firebase_admin import credentials
 import pandas as pd
 import tensorflow as tf
+
+# Cấu hình TensorFlow logging
+tf.get_logger().setLevel('FATAL')
+tf.autograph.set_verbosity(0)
 from ...lib.models.interaction_repository import InteractionRepository
 from ...lib.models.item_repository import ItemRepository
 from ...lib.models.user_repository import UserRepository
@@ -14,7 +29,7 @@ from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
 
 # CONSTANTS cho stream data optimization
-RELOAD_DEBOUNCE_DELAY = 5.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
+RELOAD_DEBOUNCE_DELAY = 20.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
 MAX_RELOAD_DELAY = 60.0     # Thời gian tối đa chờ trước khi buộc phải reload
 IGNORE_CHANGES_DURING_RELOAD = True  # Bỏ qua các thay đổi trong quá trình reload
 
@@ -135,6 +150,9 @@ class DataManager:
         if self.reload_timer:
             self.reload_timer.cancel()
             self.reload_timer = None
+        
+        # Đặt reload_pending = True để _execute_reload() thực sự chạy
+        self.reload_pending = True
         self._execute_reload()
 
     def _schedule_debounced_reload(self):

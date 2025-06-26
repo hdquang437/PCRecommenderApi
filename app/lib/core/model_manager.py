@@ -1,5 +1,16 @@
 import os
+import warnings
+
+# Tắt TensorFlow warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+warnings.filterwarnings("ignore")
+
 import tensorflow as tf
+
+# Cấu hình TensorFlow logging
+tf.get_logger().setLevel('FATAL')
+tf.autograph.set_verbosity(0)
+
 from .model import WideAndDeepModel
 from ...paths import MODEL_PATH
 
