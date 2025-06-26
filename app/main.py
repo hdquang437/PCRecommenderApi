@@ -308,3 +308,212 @@ async def test_concurrent_requests():
             "error": str(e),
             "status": "failed"
         }
+
+@app.get("/debug/datatable")
+async def get_current_datatable():
+    """API để xem datatable hiện tại"""
+    try:
+        # Lấy data hiện tại từ DataManager
+        data = data_manager.get_data()
+        
+        # Chuyển đổi thành format dễ đọc
+        result = {
+            "status": "success",
+            "total_rows": len(data),
+            "columns": list(data.columns),
+            "data_sample": data.head(10).to_dict('records'),  # 10 rows đầu
+            "data_types": data.dtypes.to_dict(),
+            "summary": {
+                "unique_users": data["user_id"].nunique() if "user_id" in data.columns else 0,
+                "unique_products": data["product_id"].nunique() if "product_id" in data.columns else 0,
+                "unique_locations": data["location"].nunique() if "location" in data.columns else 0,
+                "unique_types": data["type"].nunique() if "type" in data.columns else 0,
+                "total_interactions": len(data),
+                "positive_labels": int(data["label"].sum()) if "label" in data.columns else 0
+            }
+        }
+        
+        print(f"📊 Datatable info requested - {len(data)} rows, {len(data.columns)} columns")
+        return result
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to retrieve datatable"
+        }
+
+@app.post("/admin/force-reload")
+async def force_reload_data():
+    """API để force reload data mới từ Firebase"""
+    try:
+        print("🔄 Force reload data requested...")
+        
+        # Force execute reload ngay lập tức
+        data_manager._force_execute_reload()
+        
+        # Chờ một chút để reload hoàn thành
+        await asyncio.sleep(0.5)
+        
+        # Lấy thông tin data mới
+        try:
+            data = data_manager.get_data()
+            data_info = {
+                "total_rows": len(data),
+                "unique_users": data["user_id"].nunique() if "user_id" in data.columns else 0,
+                "unique_products": data["product_id"].nunique() if "product_id" in data.columns else 0,
+                "last_updated": "just now"
+            }
+        except:
+            data_info = {"status": "reload_in_progress"}
+        
+        print("✅ Force reload completed!")
+        
+        return {
+            "status": "success",
+            "message": "Data reload forced successfully",
+            "action": "force_reload_executed",
+            "data_info": data_info,
+            "note": "Data will be refreshed in a few seconds"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to force reload data"
+        }
+
+@app.post("/admin/reset-reload-state")
+async def reset_reload_state():
+    """API để reset trạng thái reload khi bị stuck"""
+    try:
+        old_state = {
+            "is_reloading": getattr(data_manager, 'is_reloading', False),
+            "reload_pending": getattr(data_manager, 'reload_pending', False),
+            "changes_ignored_count": getattr(data_manager, 'changes_ignored_count', 0)
+        }
+        
+        # Reset tất cả flags
+        data_manager.is_reloading = False
+        data_manager.reload_pending = False
+        data_manager.changes_ignored_count = 0
+        data_manager.first_reload_time = None
+        
+        # Cancel timer nếu có
+        if hasattr(data_manager, 'reload_timer') and data_manager.reload_timer:
+            data_manager.reload_timer.cancel()
+            data_manager.reload_timer = None
+        
+        print("🔧 Reload state has been reset!")
+        
+        return {
+            "status": "success",
+            "message": "Reload state reset successfully",
+            "old_state": old_state,
+            "new_state": {
+                "is_reloading": False,
+                "reload_pending": False,
+                "changes_ignored_count": 0
+            },
+            "note": "System is now ready to accept new changes"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to reset reload state"
+        }
+
+@app.get("/debug/system-status")
+async def get_system_status():
+    """API để xem trạng thái hệ thống"""
+    try:
+        # Kiểm tra trạng thái DataManager
+        is_reloading = getattr(data_manager, 'is_reloading', False)
+        reload_pending = getattr(data_manager, 'reload_pending', False)
+        changes_ignored = getattr(data_manager, 'changes_ignored_count', 0)
+        
+        # Kiểm tra data
+        try:
+            data = data_manager.get_data()
+            data_status = "loaded"
+            data_rows = len(data)
+        except:
+            data_status = "not_loaded"
+            data_rows = 0
+            
+        # Kiểm tra model
+        model_exists = os.path.exists(MODEL_PATH)
+        
+        return {
+            "status": "success",
+            "system_status": {
+                "data_manager": {
+                    "is_reloading": is_reloading,
+                    "reload_pending": reload_pending,
+                    "changes_ignored_count": changes_ignored,
+                    "data_status": data_status,
+                    "data_rows": data_rows
+                },
+                "model": {
+                    "model_file_exists": model_exists,
+                    "model_path": MODEL_PATH
+                },
+                "constants": {
+                    "reload_debounce_delay": "3.0s",
+                    "max_reload_delay": "60.0s",
+                    "ignore_changes_during_reload": True
+                }
+            }
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to get system status"
+        }
+
+@app.post("/admin/reset-reload-state")
+async def reset_reload_state():
+    """API để reset trạng thái reload khi bị stuck"""
+    try:
+        old_state = {
+            "is_reloading": getattr(data_manager, 'is_reloading', False),
+            "reload_pending": getattr(data_manager, 'reload_pending', False),
+            "changes_ignored_count": getattr(data_manager, 'changes_ignored_count', 0)
+        }
+        
+        # Reset tất cả flags
+        data_manager.is_reloading = False
+        data_manager.reload_pending = False
+        data_manager.changes_ignored_count = 0
+        data_manager.first_reload_time = None
+        
+        # Cancel timer nếu có
+        if hasattr(data_manager, 'reload_timer') and data_manager.reload_timer:
+            data_manager.reload_timer.cancel()
+            data_manager.reload_timer = None
+        
+        print("🔧 Reload state has been reset!")
+        
+        return {
+            "status": "success",
+            "message": "Reload state reset successfully",
+            "old_state": old_state,
+            "new_state": {
+                "is_reloading": False,
+                "reload_pending": False,
+                "changes_ignored_count": 0
+            },
+            "note": "System is now ready to accept new changes"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "message": "Failed to reset reload state"
+        }

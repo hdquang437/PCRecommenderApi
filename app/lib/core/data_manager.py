@@ -14,7 +14,7 @@ from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
 
 # CONSTANTS cho stream data optimization
-RELOAD_DEBOUNCE_DELAY = 3.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
+RELOAD_DEBOUNCE_DELAY = 5.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
 MAX_RELOAD_DELAY = 60.0     # Thời gian tối đa chờ trước khi buộc phải reload
 IGNORE_CHANGES_DURING_RELOAD = True  # Bỏ qua các thay đổi trong quá trình reload
 
@@ -156,18 +156,32 @@ class DataManager:
         self.loop.call_soon_threadsafe(asyncio.create_task, self._handle_reload())
 
     async def _handle_reload(self):
-        await self.load_data(reload=True)
-        self.preprocess_data(reload=True)
+        try:
+            print("Starting data reload...")
+            await self.load_data(reload=True)
+            self.preprocess_data(reload=True)
+            print("Data reload completed successfully!")
+        except Exception as e:
+            print(f"Error during data reload: {str(e)}")
+        finally:
+            # CRITICAL: Reset is_reloading flag để cho phép reload tiếp theo
+            self.is_reloading = False
+            print("Reload flag reset - ready for next changes")
 
     async def _handle_initial_load(self):
         """Load data ngay lập tức khi khởi tạo, không cần chờ changes"""
         try:
             print("Starting initial data load...")
+            self.is_reloading = True  # Set flag during initial load
             await self.load_data(reload=True)
             self.preprocess_data(reload=True)
             print("Initial data load completed successfully!")
         except Exception as e:
             print(f"Error during initial data load: {str(e)}")
+        finally:
+            # Reset flag sau khi initial load hoàn thành
+            self.is_reloading = False
+            print("Initial load completed - ready for change detection")
 
     async def load_data(self, reload=False):
         """Load dữ liệu từ đầu nếu reload=True, nếu không dùng dữ liệu cũ."""
