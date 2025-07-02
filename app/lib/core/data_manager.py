@@ -5,6 +5,10 @@ import threading
 import warnings
 from datetime import datetime
 
+from app.lib.core.model_config import BATCH_SIZE, RANDOM_SEED
+# CSV Configuration import
+from app.lib.core.model_config import USE_CSV, CSV_DATA_PATH, CSV_FILENAME
+
 # Tắt TensorFlow warnings và debug messages
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Chỉ hiện FATAL errors
 os.environ["TF_DATA_AUTOTUNE_RAM_BUDGET"] = "104857600"  # 100 MB
@@ -56,8 +60,19 @@ class DataManager:
                     cls._instance.init_lock = threading.Lock()  # Lock cho initialization
                     cls._instance.is_initializing = False  # Flag cho initialization
                     
-                    # Kiểm tra nếu chưa được khởi tạo
-                    if not firebase_admin._apps:
+                    # CSV Configuration
+                    cls._instance.use_csv = USE_CSV
+                    cls._instance.csv_data_path = CSV_DATA_PATH
+                    cls._instance.csv_filename = CSV_FILENAME
+                    cls._instance.csv_file_path = os.path.join(cls._instance.csv_data_path, cls._instance.csv_filename)
+                    
+                    print(f"✅ DataManager initialized")
+                    print(f"📊 Data source: {'CSV' if cls._instance.use_csv else 'Firebase'}")
+                    if cls._instance.use_csv:
+                        print(f"📁 CSV file: {cls._instance.csv_file_path}")
+                    
+                    # Chỉ khởi tạo Firebase nếu không sử dụng CSV
+                    if not cls._instance.use_csv and not firebase_admin._apps:
                         try:
                             # Thử sử dụng file Firebase key trước
                             cred = credentials.Certificate(FIREBASE_KEY_PATH)
@@ -79,13 +94,27 @@ class DataManager:
                                     raise ValueError("Both FIREBASE_KEY_PATH file and FIREBASE_KEY_JSON environment variable are unavailable")
                             except Exception as env_error:
                                 raise ValueError(f"Failed to initialize Firebase: {env_error}")
+                    elif cls._instance.use_csv:
+                        print("🚫 Skipping Firebase initialization - using CSV data source")
                     
-                    cls.loop = asyncio.get_event_loop()
+                    if not cls._instance.use_csv:
+                        cls.loop = asyncio.get_event_loop()
 
         return cls._instance
 
     def start_streams(self):
         """Bắt đầu lắng nghe thay đổi từ Firestore với debounced reload"""
+        if self.use_csv:
+            print("🚫 Skipping Firestore streams - using CSV data source")
+            # Load CSV data immediately instead
+            print("Performing initial CSV data load...")
+            success = self.load_csv_data()
+            if not success:
+                raise ValueError("Failed to load initial CSV data")
+            self.preprocess_data(reload=True)
+            print("✅ CSV data loaded and preprocessed successfully!")
+            return
+        
         print("Starting Firestore stream listeners...")
         
         # INITIAL LOAD: Load data ngay lập tức khi khởi tạo
@@ -202,22 +231,20 @@ class DataManager:
             print("Initial load completed - ready for change detection")
 
     async def load_data(self, reload=False):
-        """Load dữ liệu từ đầu nếu reload=True, nếu không dùng dữ liệu cũ."""
+        """Load dữ liệu từ CSV hoặc Firebase tùy theo cấu hình."""
         if self.data is None or reload:
-            # self.data = pd.DataFrame({
-            #     "user_id": ["U001", "U001", "U002", "U002", "U003"],
-            #     "gender": ["Male", "Male", "Female", "Female", "Male"],
-            #     "age_range": ["18-25", "18-25", "26-35", "26-35", "36-50"],
-            #     "product_id": ["P001", "P002", "P003", "P004", "P005"],
-            #     "type": ["Clothing", "Electronics", "Food", "Furniture", "Shoes"],
-            #     "price_range": ["Medium", "High", "Low", "High", "Medium"],
-            #     "location": ["TP. HCM", "Hà Nội", "TP. HCM", "Hà Nội", "Đà Nẵng"],
-            #     "click_times": [3, 0, 5, 2, 10],
-            #     "buy_times": [1, 0, 2, 0, 1],
-            #     "rating": [4.5, None, 4.0, None, 3.8],
-            #     "label": [1.0, 0.0, 1.0, 0.0, 1.0]
-            # })
-
+            print(f"🔄 Loading data - Source: {'CSV' if self.use_csv else 'Firebase'}")
+            
+            if self.use_csv:
+                # Load from CSV file
+                success = self.load_csv_data()
+                if not success:
+                    raise ValueError("Failed to load CSV data. Check CSV file path and format.")
+                else:
+                    print("✅ CSV data loaded successfully!")
+                    return
+            
+            # Original Firebase loading logic
             print("Loading dataset from Firestore...")
             
             user_repo = UserRepository()
@@ -279,12 +306,27 @@ class DataManager:
             self.data.rename(columns={
                 "item_id": "product_id",
                 "item_type": "type",
-                "seller_location": "location",            }, inplace=True)
+                "seller_location": "location",
+            }, inplace=True)
             
-            # Tạo label
-            self.data["label"] = self.data["click_times"].apply(lambda x: 1.0 if x > 0 else 0.0)
+            # Fill missing values trước khi tạo label
+            # Rating mặc định = 1.0 (thấp nhất) thay vì 3.0 (trung bình)
+            self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 1.0}, inplace=True)
             
-            self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 3.0}, inplace=True)
+            # FIXED NORMALIZATION VALUES - Based on single product interaction patterns
+            FIXED_MAX_BUYS = self.data['buy_times'].max()      # Max purchases of same product (realistic for most items)
+            # Label chính sử dụng buy_times
+            self.data["label"] = (self.data["buy_times"] / FIXED_MAX_BUYS).clip(0, 1)
+            
+            print(f"Calculated labels:")
+            print(f"  - Label range: {self.data['label'].min():.4f} to {self.data['label'].max():.4f}")
+            print(f"  - Label mean: {self.data['label'].mean():.4f}")
+            print(f"  - Label std: {self.data['label'].std():.4f}")
+            print(f"  - Labels > 0: {(self.data['label'] > 0).sum()}/{len(self.data)}")
+            
+            # Warning if all labels are too low
+            if self.data['label'].mean() < 0.05:
+                print("⚠️ WARNING: Very low label values - check if data has enough positive interactions")
             
             # Export Firebase data to CSV files for analysis (chỉ khi local deployment)
             if self.is_local_deployment:
@@ -320,25 +362,21 @@ class DataManager:
             self.data["rating"] = self.data["rating"].astype(float)
             self.data["label"] = self.data["label"].astype(float)
 
-            # Tạo TensorFlow dataset
-
-            self.dataset = tf.data.Dataset.from_tensor_slices((
-                dict(self.data.drop(columns=["user_id", "product_id"])),
-                self.data["label"]
-            ))
-
-            self.dataset = self.dataset.map(lambda x, y: (
-                {k: tf.cast(v, tf.float32) if v.dtype == tf.float64 else tf.cast(v, tf.int32) for k, v in x.items()},
-                tf.cast(y, tf.float32)
-            ))
-
-            self.dataset = self.dataset.shuffle(len(self.data)).batch(2, drop_remainder=True)
-            
             print("Data preprocessing completed!")
 
     def get_data(self):
         """Trả về dữ liệu dưới dạng pandas DataFrame - Thread safe read."""
         with self.data_lock:
+            if self.data is None:
+                # Auto-load data based on configuration
+                if self.use_csv:
+                    print("🔄 Auto-loading CSV data...")
+                    success = self.load_csv_data()
+                    if not success:
+                        raise ValueError("Failed to load data from CSV. Check CSV file path and format.")
+                else:
+                    raise ValueError("Firebase data not loaded. Use async load_data() method first or switch to CSV mode.")
+                        
             if self.data is None:
                 raise ValueError("Data not loaded yet")
             # Trả về copy để tránh modification từ bên ngoài
@@ -347,9 +385,23 @@ class DataManager:
     def get_dataset(self):
         """Trả về dữ liệu dưới dạng TensorFlow dataset - Thread safe read."""
         with self.data_lock:
-            if self.dataset is None:
-                raise ValueError("Dataset not preprocessed yet")
-            return self.dataset
+            if self.data is None:
+                raise ValueError("Data not preprocessed yet")
+            
+            # Tạo TensorFlow dataset
+            dataset = tf.data.Dataset.from_tensor_slices((
+                dict(self.data.drop(columns=["user_id", "product_id"])),
+                self.data["label"]
+            ))
+
+            dataset = dataset.map(lambda x, y: (
+                {k: tf.cast(v, tf.float32) if v.dtype == tf.float64 else tf.cast(v, tf.int32) for k, v in x.items()},
+                tf.cast(y, tf.float32)
+            ))
+
+            dataset = dataset.shuffle(len(self.data), seed=RANDOM_SEED)
+
+            return dataset
     
     def get_product_ids(self):
         """Return product ids - Thread safe."""
@@ -360,70 +412,103 @@ class DataManager:
 
     def build_empty_sample(self, user_id, product_id):
         """Tạo sample giả với buy_times, click_times, rating = 0 nếu chưa có tương tác - Thread safe."""
-        # Thread-safe access to firebase data
         with self.data_lock:
-            user_df = self.firebaseData.get("users")
-            item_df = self.firebaseData.get("items")
-            seller_df = self.firebaseData.get("sellers")
+            if self.data is None:
+                raise ValueError("Data not loaded yet. Call get_data() first.")
             
-            if user_df is None or item_df is None or seller_df is None:
-                raise ValueError("Firebase data not loaded properly")
+            if self.use_csv:
+                # CSV mode: Extract info from main dataset
+                user_rows = self.data[self.data["user_id"] == user_id]
+                product_rows = self.data[self.data["product_id"] == product_id]
+                
+                if user_rows.empty:
+                    raise ValueError(f"User ID {user_id} not found in CSV data")
+                if product_rows.empty:
+                    raise ValueError(f"Product ID {product_id} not found in CSV data")
+                
+                # Get info from existing data
+                user_info = user_rows.iloc[0]
+                product_info = product_rows.iloc[0]
+                
+                sample = {
+                    "user_id": user_id,
+                    "gender": user_info["gender"],
+                    "age_range": user_info["age_range"],
+                    "product_id": product_id,
+                    "type": product_info["type"],
+                    "price_range": product_info["price_range"],
+                    "location": product_info["location"],
+                    "click_times": 0.0,
+                    "buy_times": 0.0,
+                    "rating": 1.0,  # Minimum rating for no interaction
+                    "label": 0.0    # No interaction = 0 label
+                }
+                
+            else:
+                # Firebase mode: Use original logic
+                user_df = self.firebaseData.get("users")
+                item_df = self.firebaseData.get("items")
+                seller_df = self.firebaseData.get("sellers")
+                
+                if user_df is None or item_df is None or seller_df is None:
+                    raise ValueError("Firebase data not loaded properly")
 
-            # Lấy thông tin user
-            user_row = user_df[user_df["id"] == user_id]
-            if user_row.empty:
-                raise ValueError(f"User ID {user_id} not found")
-            user_row = user_row.iloc[0]
+                # Lấy thông tin user
+                user_row = user_df[user_df["id"] == user_id]
+                if user_row.empty:
+                    raise ValueError(f"User ID {user_id} not found")
+                user_row = user_row.iloc[0]
 
-            # Lấy thông tin item
-            item_row = item_df[item_df["id"] == product_id]
-            if item_row.empty:
-                raise ValueError(f"Product ID {product_id} not found")
-            item_row = item_row.iloc[0]
+                # Lấy thông tin item
+                item_row = item_df[item_df["id"] == product_id]
+                if item_row.empty:
+                    raise ValueError(f"Product ID {product_id} not found")
+                item_row = item_row.iloc[0]
 
-            # Lấy location từ seller
-            seller_row = seller_df[seller_df["seller_id"] == item_row["seller_id"]]
-            location = seller_row["seller_location"].values[0] if not seller_row.empty else "unknown"
+                # Lấy location từ seller
+                seller_row = seller_df[seller_df["seller_id"] == item_row["seller_id"]]
+                location = seller_row["seller_location"].values[0] if not seller_row.empty else "unknown"
 
-        # Tính age_range
-        current_year = datetime.now().year
-        age = current_year - user_row["date_of_birth"].year
-        if age <= 25:
-            age_range = "18-25"
-        elif age <= 35:
-            age_range = "26-35"
-        elif age <= 50:
-            age_range = "36-50"
-        else:
-            age_range = "50+"
+                # Tính age_range
+                current_year = datetime.now().year
+                age = current_year - user_row["date_of_birth"].year
+                if age <= 25:
+                    age_range = "18-25"
+                elif age <= 35:
+                    age_range = "26-35"
+                elif age <= 50:
+                    age_range = "36-50"
+                else:
+                    age_range = "50+"
 
-        # Tính price_range
-        price = item_row["price"]
-        if price <= 200000:
-            price_range = "budget"
-        elif price <= 1000000:
-            price_range = "mid-range"
-        elif price <= 3000000:
-            price_range = "upper mid-range"
-        elif price <= 7000000:
-            price_range = "premium"
-        else:
-            price_range = "flagship"
+                # Tính price_range
+                price = item_row["price"]
+                if price <= 200000:
+                    price_range = "budget"
+                elif price <= 1000000:
+                    price_range = "mid-range"
+                elif price <= 3000000:
+                    price_range = "upper mid-range"
+                elif price <= 7000000:
+                    price_range = "premium"
+                else:
+                    price_range = "flagship"
 
-        sample = {
-            "user_id": user_id,
-            "gender": user_row["gender"],
-            "age_range": age_range,
-            "product_id": product_id,
-            "type": item_row["item_type"],
-            "price_range": price_range,
-            "location": location,
-            "click_times": 0.0,
-            "buy_times": 0.0,
-            "rating": 0.0,
-            "label": 0.0
-        }
-
+                sample = {
+                    "user_id": user_id,
+                    "gender": user_row["gender"],
+                    "age_range": age_range,
+                    "product_id": product_id,
+                    "type": item_row["item_type"],
+                    "price_range": price_range,
+                    "location": location,
+                    "click_times": 0.0,
+                    "buy_times": 0.0,
+                    "rating": 1.0,  # Minimum rating for no interaction
+                    "label": 0.0    # No interaction = 0 label
+                }
+        
+        print(f"Built empty sample - user: {user_id}, product: {product_id}, label: 0.0")
         return sample
     
     def encode_sample(self, sample_dict):
@@ -552,3 +637,73 @@ class DataManager:
                 "price_range": list(self.data["price_range"].astype("category").cat.categories),
                 "location": list(self.data["location"].astype("category").cat.categories),
             }
+
+    def load_csv_data(self):
+        """Load data directly from final_dataset.csv"""
+        try:
+            # Build CSV file path from config
+            csv_file_path = os.path.join(self.csv_data_path, self.csv_filename)
+            print(f"📁 Loading data from CSV: {csv_file_path}")
+            
+            if not os.path.exists(csv_file_path):
+                print(f"❌ CSV file not found: {csv_file_path}")
+                return False
+            
+            # Load the complete dataset
+            df = pd.read_csv(csv_file_path)
+            print(f"✅ Loaded CSV: {len(df)} records")
+            
+            # Validate required columns
+            required_columns = ['user_id', 'product_id', 'gender', 'age_range', 'type', 
+                              'price_range', 'location', 'click_times', 'buy_times', 'rating']
+            
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                print(f"❌ Missing required columns: {missing_columns}")
+                return False
+            
+            # Process data similar to load_data() method
+            self.data = df
+            
+            # Fill missing values
+            self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 1.0}, inplace=True)
+            
+            # Calculate dynamic max_buys for normalization
+            actual_max_buys = self.data['buy_times'].max()
+            FIXED_MAX_BUYS = max(1, int(actual_max_buys))  # At least 1
+            
+            print(f"📊 Data statistics:")
+            print(f"  Max buy_times: {actual_max_buys}")
+            print(f"  Using FIXED_MAX_BUYS: {FIXED_MAX_BUYS}")
+            
+            # Create label using same logic as Firebase loading
+            if 'label' not in self.data.columns:
+                self.data["label"] = (self.data["buy_times"] / FIXED_MAX_BUYS).clip(0, 1)
+                print(f"✅ Created labels from buy_times")
+            else:
+                print(f"✅ Using existing labels from CSV")
+            
+            print(f"📈 Label statistics:")
+            print(f"  Label range: {self.data['label'].min():.4f} to {self.data['label'].max():.4f}")
+            print(f"  Label mean: {self.data['label'].mean():.4f}")
+            print(f"  Labels > 0: {(self.data['label'] > 0).sum()}/{len(self.data)}")
+            
+            # Store metadata for build_empty_sample consistency
+            self.csv_max_buys = FIXED_MAX_BUYS
+            
+            print(f"✅ CSV data processed successfully - {len(self.data)} samples")
+            
+            # Print data summary
+            print(f"📊 Data summary:")
+            print(f"  Users: {df['user_id'].nunique()}")
+            print(f"  Products: {df['product_id'].nunique()}")  
+            print(f"  Interactions: {len(df)}")
+            print(f"  Buy times range: {df['buy_times'].min()} - {df['buy_times'].max()}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error loading CSV data: {e}")
+            import traceback
+            traceback.print_exc()
+            return False

@@ -181,9 +181,9 @@ async def build():
         
         await ensure_data_loaded()
             
-        train_model()
+        result = train_model()
         print("Build done!")
-        return {"message": "Build successfully"}
+        return result
     except Exception as e:
         print("Build failed with error: ")
         print(e)

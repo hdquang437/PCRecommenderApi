@@ -1,0 +1,400 @@
+user_id,gender,age_range,product_id,type,price_range,location,click_times,buy_times,rating,label
+user_001,male,26-35,prod_keyboard_001,Bàn phím,premium,Hà Nội,15,8,4.5,0.4
+user_002,female,18-25,prod_mouse_001,Chuột,mid-range,TP. Hồ Chí Minh,22,12,4.8,0.6
+user_003,male,36-50,prod_monitor_001,Màn hình,flagship,Đà Nẵng,35,18,4.9,0.9
+user_004,female,26-35,prod_headset_001,Tai nghe,premium,Hà Nội,28,15,4.7,0.75
+user_005,male,18-25,prod_ssd_001,Ổ cứng SSD,upper mid-range,Cần Thơ,18,9,4.2,0.45
+user_006,female,50+,prod_webcam_001,Webcam,mid-range,Đồng Nai,12,6,4.0,0.3
+user_001,male,26-35,prod_speaker_001,Loa,flagship,Hà Nội,25,14,4.6,0.7
+user_007,male,26-35,prod_chair_001,Ghế gaming,flagship,TP. Hồ Chí Minh,40,20,5.0,1.0
+user_008,female,18-25,prod_mousepad_001,Lót chuột,budget,Bắc Ninh,8,4,3.8,0.2
+user_002,female,18-25,prod_keyboard_002,Bàn phím,upper mid-range,TP. Hồ Chí Minh,20,11,4.4,0.55
+user_009,male,36-50,prod_psu_001,Nguồn máy tính,premium,Nghệ An,30,16,4.8,0.8
+user_010,female,26-35,prod_mic_001,Microphone,upper mid-range,Hưng Yên,16,8,4.1,0.4
+user_003,male,36-50,prod_cable_001,Cáp kết nối,mid-range,Đà Nẵng,14,7,3.9,0.35
+user_011,male,18-25,prod_cooler_001,Tản nhiệt CPU,premium,Khánh Hòa,24,13,4.5,0.65
+user_012,female,50+,prod_usb_001,USB,budget,Lâm Đồng,6,3,3.5,0.15
+user_004,female,26-35,prod_vr_001,Kính VR,flagship,Hà Nội,32,17,4.9,0.85
+user_013,male,26-35,prod_controller_001,Tay cầm chơi game,upper mid-range,Quảng Ninh,19,10,4.3,0.5
+user_005,male,18-25,prod_hdd_001,Ổ cứng HDD,mid-range,Cần Thơ,13,6,3.7,0.3
+user_014,female,36-50,prod_ups_001,Bộ lưu điện (UPS),premium,Thanh Hóa,21,11,4.4,0.55
+user_006,female,50+,prod_adapter_001,Bộ chuyển đổi (Adapter),upper mid-range,Đồng Nai,17,9,4.2,0.45
+user_015,male,18-25,prod_desk_001,Bàn máy tính,flagship,Hà Tĩnh,26,14,4.7,0.7
+user_007,male,26-35,prod_capture_001,Card ghi hình,premium,TP. Hồ Chí Minh,29,15,4.6,0.75
+user_016,female,26-35,prod_dock_001,Dock mở rộng cổng,upper mid-range,Thái Nguyên,15,8,4.0,0.4
+user_008,female,18-25,prod_fan_001,Quạt case,budget,Bắc Ninh,9,4,3.6,0.2
+user_017,male,36-50,prod_memory_001,Thẻ nhớ,mid-range,Sơn La,11,5,3.8,0.25
+user_009,male,36-50,prod_portable_hdd_001,Ổ cứng di động,premium,Nghệ An,23,12,4.5,0.6
+user_018,female,18-25,prod_keyboard_003,Bàn phím,mid-range,Tây Ninh,12,6,3.9,0.3
+user_010,female,26-35,prod_mouse_002,Chuột,premium,Hưng Yên,18,9,4.3,0.45
+user_019,male,50+,prod_monitor_002,Màn hình,flagship,Cao Bằng,31,16,4.8,0.8
+user_011,male,18-25,prod_headset_002,Tai nghe,upper mid-range,Khánh Hòa,20,10,4.2,0.5
+user_020,female,26-35,prod_speaker_002,Loa,premium,Điện Biên,22,11,4.4,0.55
+user_012,female,50+,prod_webcam_002,Webcam,mid-range,Lâm Đồng,10,5,3.7,0.25
+user_013,male,26-35,prod_ssd_002,Ổ cứng SSD,flagship,Quảng Ninh,33,17,4.9,0.85
+user_021,female,36-50,prod_chair_002,Ghế gaming,premium,Đắk Lắk,27,14,4.6,0.7
+user_014,female,36-50,prod_mousepad_002,Lót chuột,upper mid-range,Thanh Hóa,14,7,4.0,0.35
+user_022,male,18-25,prod_psu_002,Nguồn máy tính,flagship,Gia Lai,28,15,4.7,0.75
+user_015,male,18-25,prod_mic_002,Microphone,premium,Hà Tĩnh,19,10,4.3,0.5
+user_023,female,26-35,prod_cable_002,Cáp kết nối,budget,Lạng Sơn,7,3,3.4,0.15
+user_016,female,26-35,prod_cooler_002,Tản nhiệt CPU,upper mid-range,Thái Nguyên,16,8,4.1,0.4
+user_024,male,36-50,prod_usb_002,USB,mid-range,Ninh Bình,9,4,3.6,0.2
+user_017,male,36-50,prod_vr_002,Kính VR,flagship,Sơn La,35,18,5.0,0.9
+user_025,female,18-25,prod_controller_002,Tay cầm chơi game,premium,Phú Thọ,21,11,4.4,0.55
+user_018,female,18-25,prod_hdd_002,Ổ cứng HDD,upper mid-range,Tây Ninh,13,6,3.8,0.3
+user_026,male,50+,prod_ups_002,Bộ lưu điện (UPS),flagship,Quảng Ngãi,30,16,4.8,0.8
+user_019,male,50+,prod_adapter_002,Bộ chuyển đổi (Adapter),premium,Cao Bằng,24,12,4.5,0.6
+user_027,female,26-35,prod_desk_002,Bàn máy tính,upper mid-range,Quảng Trị,17,9,4.2,0.45
+user_020,female,26-35,prod_capture_002,Card ghi hình,flagship,Điện Biên,32,17,4.9,0.85
+user_028,male,18-25,prod_dock_002,Dock mở rộng cổng,premium,Thừa Thiên Huế,20,10,4.3,0.5
+user_021,female,36-50,prod_fan_002,Quạt case,mid-range,Đắk Lắk,11,5,3.7,0.25
+user_029,male,26-35,prod_memory_002,Thẻ nhớ,upper mid-range,Tuyên Quang,15,8,4.0,0.4
+user_022,male,18-25,prod_portable_hdd_002,Ổ cứng di động,flagship,Gia Lai,29,15,4.7,0.75
+user_030,female,36-50,prod_keyboard_004,Bàn phím,premium,Vĩnh Long,22,11,4.4,0.55
+user_001,male,26-35,prod_mouse_003,Chuột,flagship,Hà Nội,34,18,4.9,0.9
+user_002,female,18-25,prod_monitor_003,Màn hình,premium,TP. Hồ Chí Minh,26,13,4.6,0.65
+user_003,male,36-50,prod_headset_003,Tai nghe,flagship,Đà Nẵng,31,16,4.8,0.8
+user_004,female,26-35,prod_speaker_003,Loa,upper mid-range,Hà Nội,18,9,4.2,0.45
+user_005,male,18-25,prod_webcam_003,Webcam,premium,Cần Thơ,23,12,4.5,0.6
+user_031,female,50+,prod_ssd_003,Ổ cứng SSD,flagship,Đắk Nông,33,17,4.9,0.85
+user_006,female,50+,prod_chair_003,Ghế gaming,premium,Đồng Nai,25,13,4.6,0.65
+user_007,male,26-35,prod_mousepad_003,Lót chuột,upper mid-range,TP. Hồ Chí Minh,16,8,4.1,0.4
+user_008,female,18-25,prod_psu_003,Nguồn máy tính,flagship,Bắc Ninh,30,15,4.7,0.75
+user_009,male,36-50,prod_mic_003,Microphone,premium,Nghệ An,21,11,4.4,0.55
+user_010,female,26-35,prod_cable_003,Cáp kết nối,upper mid-range,Hưng Yên,14,7,3.9,0.35
+user_011,male,18-25,prod_cooler_003,Tản nhiệt CPU,flagship,Khánh Hòa,28,14,4.7,0.7
+user_012,female,50+,prod_usb_003,USB,premium,Lâm Đồng,19,10,4.3,0.5
+user_013,male,26-35,prod_vr_003,Kính VR,flagship,Quảng Ninh,36,19,5.0,0.95
+user_014,female,36-50,prod_controller_003,Tay cầm chơi game,premium,Thanh Hóa,24,12,4.5,0.6
+user_015,male,18-25,prod_hdd_003,Ổ cứng HDD,upper mid-range,Hà Tĩnh,15,7,3.9,0.35
+user_016,female,26-35,prod_ups_003,Bộ lưu điện (UPS),flagship,Thái Nguyên,32,16,4.8,0.8
+user_017,male,36-50,prod_adapter_003,Bộ chuyển đổi (Adapter),premium,Sơn La,20,10,4.3,0.5
+user_018,female,18-25,prod_desk_003,Bàn máy tính,flagship,Tây Ninh,27,14,4.6,0.7
+user_019,male,50+,prod_capture_003,Card ghi hình,upper mid-range,Cao Bằng,17,8,4.0,0.4
+user_020,female,26-35,prod_dock_003,Dock mở rộng cổng,flagship,Điện Biên,29,15,4.7,0.75
+user_021,female,36-50,prod_fan_003,Quạt case,premium,Đắk Lắk,22,11,4.4,0.55
+user_022,male,18-25,prod_memory_003,Thẻ nhớ,upper mid-range,Gia Lai,13,6,3.8,0.3
+user_023,female,26-35,prod_portable_hdd_003,Ổ cứng di động,flagship,Lạng Sơn,31,16,4.8,0.8
+user_024,male,36-50,prod_keyboard_005,Bàn phím,premium,Ninh Bình,25,13,4.6,0.65
+user_025,female,18-25,prod_mouse_004,Chuột,upper mid-range,Phú Thọ,18,9,4.2,0.45
+user_026,male,50+,prod_monitor_004,Màn hình,flagship,Quảng Ngãi,35,18,4.9,0.9
+user_027,female,26-35,prod_headset_004,Tai nghe,premium,Quảng Trị,23,12,4.5,0.6
+user_028,male,18-25,prod_speaker_004,Loa,flagship,Thừa Thiên Huế,30,15,4.7,0.75
+user_029,male,26-35,prod_webcam_004,Webcam,upper mid-range,Tuyên Quang,16,8,4.1,0.4
+user_030,female,36-50,prod_ssd_004,Ổ cứng SSD,flagship,Vĩnh Long,34,17,4.9,0.85
+user_031,female,50+,prod_chair_004,Ghế gaming,premium,Đắk Nông,26,13,4.6,0.65
+user_001,male,26-35,prod_mousepad_004,Lót chuột,mid-range,Hà Nội,12,6,3.9,0.3
+user_002,female,18-25,prod_psu_004,Nguồn máy tính,flagship,TP. Hồ Chí Minh,32,16,4.8,0.8
+user_003,male,36-50,prod_mic_004,Microphone,premium,Đà Nẵng,21,11,4.4,0.55
+user_004,female,26-35,prod_cable_004,Cáp kết nối,upper mid-range,Hà Nội,15,7,3.9,0.35
+user_005,male,18-25,prod_cooler_004,Tản nhiệt CPU,flagship,Cần Thơ,28,14,4.7,0.7
+user_006,female,50+,prod_usb_004,USB,premium,Đồng Nai,19,10,4.3,0.5
+user_007,male,26-35,prod_vr_004,Kính VR,flagship,TP. Hồ Chí Minh,37,19,5.0,0.95
+user_008,female,18-25,prod_controller_004,Tay cầm chơi game,premium,Bắc Ninh,24,12,4.5,0.6
+user_009,male,36-50,prod_hdd_004,Ổ cứng HDD,upper mid-range,Nghệ An,14,7,3.8,0.35
+user_010,female,26-35,prod_ups_004,Bộ lưu điện (UPS),flagship,Hưng Yên,33,17,4.9,0.85
+user_011,male,18-25,prod_adapter_004,Bộ chuyển đổi (Adapter),premium,Khánh Hòa,20,10,4.3,0.5
+user_012,female,50+,prod_desk_004,Bàn máy tính,flagship,Lâm Đồng,29,15,4.7,0.75
+user_013,male,26-35,prod_capture_004,Card ghi hình,upper mid-range,Quảng Ninh,17,8,4.0,0.4
+user_014,female,36-50,prod_dock_004,Dock mở rộng cổng,flagship,Thanh Hóa,31,16,4.8,0.8
+user_015,male,18-25,prod_fan_004,Quạt case,premium,Hà Tĩnh,22,11,4.4,0.55
+user_016,female,26-35,prod_memory_004,Thẻ nhớ,upper mid-range,Thái Nguyên,13,6,3.8,0.3
+user_017,male,36-50,prod_portable_hdd_004,Ổ cứng di động,flagship,Sơn La,32,16,4.8,0.8
+user_018,female,18-25,prod_keyboard_006,Bàn phím,premium,Tây Ninh,25,13,4.6,0.65
+user_019,male,50+,prod_mouse_005,Chuột,upper mid-range,Cao Bằng,18,9,4.2,0.45
+user_020,female,26-35,prod_monitor_005,Màn hình,flagship,Điện Biên,36,18,4.9,0.9
+user_021,female,36-50,prod_headset_005,Tai nghe,premium,Đắk Lắk,23,12,4.5,0.6
+user_022,male,18-25,prod_speaker_005,Loa,flagship,Gia Lai,30,15,4.7,0.75
+user_023,female,26-35,prod_webcam_005,Webcam,upper mid-range,Lạng Sơn,16,8,4.1,0.4
+user_024,male,36-50,prod_ssd_005,Ổ cứng SSD,flagship,Ninh Bình,34,17,4.9,0.85
+user_025,female,18-25,prod_chair_005,Ghế gaming,flagship,Phú Thọ,38,19,5.0,0.95
+user_026,male,50+,prod_mousepad_005,Lót chuột,premium,Quảng Ngãi,21,11,4.4,0.55
+user_027,female,26-35,prod_psu_005,Nguồn máy tính,flagship,Quảng Trị,33,17,4.9,0.85
+user_028,male,18-25,prod_mic_005,Microphone,upper mid-range,Thừa Thiên Huế,17,8,4.0,0.4
+user_029,male,26-35,prod_cable_005,Cáp kết nối,premium,Tuyên Quang,24,12,4.5,0.6
+user_030,female,36-50,prod_cooler_005,Tản nhiệt CPU,flagship,Vĩnh Long,29,15,4.7,0.75
+user_031,female,50+,prod_usb_005,USB,upper mid-range,Đắk Nông,14,7,3.9,0.35
+user_032,male,26-35,prod_vr_005,Kính VR,flagship,Lào Cai,36,18,4.9,0.9
+user_033,female,18-25,prod_controller_005,Tay cầm chơi game,premium,An Giang,22,11,4.4,0.55
+user_034,male,36-50,prod_hdd_005,Ổ cứng HDD,mid-range,Cà Mau,12,6,3.8,0.3
+user_035,female,26-35,prod_ups_005,Bộ lưu điện (UPS),flagship,Đồng Tháp,31,16,4.8,0.8
+user_036,male,18-25,prod_adapter_005,Bộ chuyển đổi (Adapter),premium,Hà Nội,19,10,4.3,0.5
+user_037,female,50+,prod_desk_005,Bàn máy tính,flagship,TP. Hồ Chí Minh,28,14,4.6,0.7
+user_038,male,26-35,prod_capture_005,Card ghi hình,upper mid-range,Đà Nẵng,16,8,4.1,0.4
+user_039,female,36-50,prod_dock_005,Dock mở rộng cổng,flagship,Cần Thơ,32,16,4.8,0.8
+user_040,male,18-25,prod_fan_005,Quạt case,premium,Bắc Ninh,23,12,4.5,0.6
+user_041,female,26-35,prod_memory_005,Thẻ nhớ,mid-range,Nghệ An,11,5,3.7,0.25
+user_042,male,36-50,prod_portable_hdd_005,Ổ cứng di động,flagship,Khánh Hòa,30,15,4.7,0.75
+user_043,female,18-25,prod_keyboard_007,Bàn phím,premium,Hưng Yên,25,13,4.6,0.65
+user_044,male,50+,prod_mouse_006,Chuột,upper mid-range,Thanh Hóa,18,9,4.2,0.45
+user_045,female,26-35,prod_monitor_006,Màn hình,flagship,Lâm Đồng,35,18,4.9,0.9
+user_046,male,18-25,prod_headset_006,Tai nghe,premium,Thái Nguyên,27,14,4.6,0.7
+user_047,female,36-50,prod_speaker_006,Loa,flagship,Hà Tĩnh,33,17,4.9,0.85
+user_048,male,26-35,prod_webcam_006,Webcam,upper mid-range,Sơn La,15,7,3.9,0.35
+user_049,female,18-25,prod_ssd_006,Ổ cứng SSD,flagship,Tây Ninh,34,17,4.9,0.85
+user_050,male,50+,prod_chair_006,Ghế gaming,premium,Cao Bằng,26,13,4.6,0.65
+user_001,male,26-35,prod_mousepad_006,Lót chuột,upper mid-range,Hà Nội,13,6,3.8,0.3
+user_002,female,18-25,prod_psu_006,Nguồn máy tính,flagship,TP. Hồ Chí Minh,31,16,4.8,0.8
+user_003,male,36-50,prod_mic_006,Microphone,premium,Đà Nẵng,20,10,4.3,0.5
+user_004,female,26-35,prod_cable_006,Cáp kết nối,mid-range,Hà Nội,14,7,3.9,0.35
+user_005,male,18-25,prod_cooler_006,Tản nhiệt CPU,flagship,Cần Thơ,28,14,4.7,0.7
+user_006,female,50+,prod_usb_006,USB,premium,Đồng Nai,19,10,4.3,0.5
+user_007,male,26-35,prod_vr_006,Kính VR,flagship,TP. Hồ Chí Minh,37,19,5.0,0.95
+user_008,female,18-25,prod_controller_006,Tay cầm chơi game,premium,Bắc Ninh,24,12,4.5,0.6
+user_009,male,36-50,prod_hdd_006,Ổ cứng HDD,upper mid-range,Nghệ An,16,8,4.0,0.4
+user_010,female,26-35,prod_ups_006,Bộ lưu điện (UPS),flagship,Hưng Yên,32,16,4.8,0.8
+user_051,male,18-25,prod_adapter_006,Bộ chuyển đổi (Adapter),premium,Điện Biên,21,11,4.4,0.55
+user_052,female,26-35,prod_desk_006,Bàn máy tính,flagship,Đắk Lắk,29,15,4.7,0.75
+user_053,male,36-50,prod_capture_006,Card ghi hình,upper mid-range,Gia Lai,17,8,4.0,0.4
+user_054,female,18-25,prod_dock_006,Dock mở rộng cổng,flagship,Lạng Sơn,30,15,4.7,0.75
+user_055,male,50+,prod_fan_006,Quạt case,premium,Ninh Bình,22,11,4.4,0.55
+user_056,female,26-35,prod_memory_006,Thẻ nhớ,upper mid-range,Phú Thọ,12,6,3.8,0.3
+user_057,male,18-25,prod_portable_hdd_006,Ổ cứng di động,flagship,Quảng Ngãi,31,16,4.8,0.8
+user_058,female,36-50,prod_keyboard_008,Bàn phím,premium,Quảng Trị,25,13,4.6,0.65
+user_059,male,26-35,prod_mouse_007,Chuột,upper mid-range,Thừa Thiên Huế,18,9,4.2,0.45
+user_060,female,18-25,prod_monitor_007,Màn hình,flagship,Tuyên Quang,36,18,4.9,0.9
+user_011,male,18-25,prod_headset_007,Tai nghe,premium,Khánh Hòa,26,13,4.6,0.65
+user_012,female,50+,prod_speaker_007,Loa,flagship,Lâm Đồng,33,17,4.9,0.85
+user_013,male,26-35,prod_webcam_007,Webcam,upper mid-range,Quảng Ninh,15,7,3.9,0.35
+user_014,female,36-50,prod_ssd_007,Ổ cứng SSD,flagship,Thanh Hóa,34,17,4.9,0.85
+user_015,male,18-25,prod_chair_007,Ghế gaming,premium,Hà Tĩnh,27,14,4.6,0.7
+user_016,female,26-35,prod_mousepad_007,Lót chuột,mid-range,Thái Nguyên,11,5,3.7,0.25
+user_017,male,36-50,prod_psu_007,Nguồn máy tính,flagship,Sơn La,32,16,4.8,0.8
+user_018,female,18-25,prod_mic_007,Microphone,premium,Tây Ninh,20,10,4.3,0.5
+user_019,male,50+,prod_cable_007,Cáp kết nối,upper mid-range,Cao Bằng,14,7,3.9,0.35
+user_020,female,26-35,prod_cooler_007,Tản nhiệt CPU,flagship,Điện Biên,28,14,4.7,0.7
+user_061,male,18-25,prod_usb_007,USB,premium,Vĩnh Long,19,10,4.3,0.5
+user_062,female,36-50,prod_vr_007,Kính VR,flagship,Đắk Nông,38,19,5.0,0.95
+user_063,male,26-35,prod_controller_007,Tay cầm chơi game,premium,Lào Cai,24,12,4.5,0.6
+user_064,female,18-25,prod_hdd_007,Ổ cứng HDD,upper mid-range,An Giang,16,8,4.0,0.4
+user_065,male,50+,prod_ups_007,Bộ lưu điện (UPS),flagship,Cà Mau,32,16,4.8,0.8
+user_066,female,26-35,prod_adapter_007,Bộ chuyển đổi (Adapter),premium,Đồng Tháp,21,11,4.4,0.55
+user_067,male,18-25,prod_desk_007,Bàn máy tính,flagship,Lai Châu,29,15,4.7,0.75
+user_068,female,36-50,prod_capture_007,Card ghi hình,upper mid-range,Đắk Lắk,17,8,4.0,0.4
+user_069,male,26-35,prod_dock_007,Dock mở rộng cổng,flagship,Gia Lai,30,15,4.7,0.75
+user_070,female,18-25,prod_fan_007,Quạt case,premium,Lạng Sơn,22,11,4.4,0.55
+user_021,female,36-50,prod_memory_007,Thẻ nhớ,mid-range,Đắk Lắk,10,5,3.6,0.25
+user_022,male,18-25,prod_portable_hdd_007,Ổ cứng di động,flagship,Gia Lai,31,16,4.8,0.8
+user_023,female,26-35,prod_keyboard_009,Bàn phím,premium,Lạng Sơn,25,13,4.6,0.65
+user_024,male,36-50,prod_mouse_008,Chuột,upper mid-range,Ninh Bình,18,9,4.2,0.45
+user_025,female,18-25,prod_monitor_008,Màn hình,flagship,Phú Thọ,36,18,4.9,0.9
+user_026,male,50+,prod_headset_008,Tai nghe,premium,Quảng Ngãi,26,13,4.6,0.65
+user_027,female,26-35,prod_speaker_008,Loa,flagship,Quảng Trị,33,17,4.9,0.85
+user_028,male,18-25,prod_webcam_008,Webcam,upper mid-range,Thừa Thiên Huế,15,7,3.9,0.35
+user_029,male,26-35,prod_ssd_008,Ổ cứng SSD,flagship,Tuyên Quang,34,17,4.9,0.85
+user_030,female,36-50,prod_chair_008,Ghế gaming,premium,Vĩnh Long,27,14,4.6,0.7
+user_071,male,18-25,prod_mousepad_008,Lót chuột,upper mid-range,Hà Nội,13,6,3.8,0.3
+user_072,female,26-35,prod_psu_008,Nguồn máy tính,flagship,TP. Hồ Chí Minh,32,16,4.8,0.8
+user_073,male,36-50,prod_mic_008,Microphone,premium,Đà Nẵng,20,10,4.3,0.5
+user_074,female,18-25,prod_cable_008,Cáp kết nối,mid-range,Cần Thơ,14,7,3.9,0.35
+user_075,male,50+,prod_cooler_008,Tản nhiệt CPU,flagship,Bắc Ninh,28,14,4.7,0.7
+user_076,female,26-35,prod_usb_008,USB,premium,Đồng Nai,19,10,4.3,0.5
+user_077,male,18-25,prod_vr_008,Kính VR,flagship,Nghệ An,37,19,5.0,0.95
+user_078,female,36-50,prod_controller_008,Tay cầm chơi game,premium,Hưng Yên,24,12,4.5,0.6
+user_079,male,26-35,prod_hdd_008,Ổ cứng HDD,upper mid-range,Khánh Hòa,16,8,4.0,0.4
+user_080,female,18-25,prod_ups_008,Bộ lưu điện (UPS),flagship,Thanh Hóa,32,16,4.8,0.8
+user_001,male,26-35,prod_memory_008,Thẻ nhớ,upper mid-range,Hà Nội,12,6,3.8,0.3
+user_001,male,26-35,prod_fan_008,Quạt case,mid-range,Hà Nội,9,4,3.6,0.2
+user_001,male,26-35,prod_dock_008,Dock mở rộng cổng,flagship,Hà Nội,35,18,4.9,0.9
+user_002,female,18-25,prod_adapter_008,Bộ chuyển đổi (Adapter),premium,TP. Hồ Chí Minh,22,11,4.4,0.55
+user_002,female,18-25,prod_desk_008,Bàn máy tính,flagship,TP. Hồ Chí Minh,30,15,4.7,0.75
+user_002,female,18-25,prod_capture_008,Card ghi hình,upper mid-range,TP. Hồ Chí Minh,17,8,4.0,0.4
+user_003,male,36-50,prod_portable_hdd_008,Ổ cứng di động,flagship,Đà Nẵng,31,16,4.8,0.8
+user_003,male,36-50,prod_fan_009,Quạt case,premium,Đà Nẵng,23,12,4.5,0.6
+user_003,male,36-50,prod_usb_009,USB,upper mid-range,Đà Nẵng,15,7,3.9,0.35
+user_004,female,26-35,prod_memory_009,Thẻ nhớ,mid-range,Hà Nội,11,5,3.7,0.25
+user_004,female,26-35,prod_desk_009,Bàn máy tính,flagship,Hà Nội,33,17,4.9,0.85
+user_004,female,26-35,prod_portable_hdd_009,Ổ cứng di động,premium,Hà Nội,24,12,4.5,0.6
+user_005,male,18-25,prod_adapter_009,Bộ chuyển đổi (Adapter),flagship,Cần Thơ,29,15,4.7,0.75
+user_005,male,18-25,prod_capture_009,Card ghi hình,premium,Cần Thơ,20,10,4.3,0.5
+user_005,male,18-25,prod_dock_009,Dock mở rộng cổng,upper mid-range,Cần Thơ,16,8,4.1,0.4
+user_006,female,50+,prod_fan_009,Quạt case,mid-range,Đồng Nai,13,6,3.8,0.3
+user_006,female,50+,prod_memory_010,Thẻ nhớ,premium,Đồng Nai,18,9,4.2,0.45
+user_006,female,50+,prod_keyboard_010,Bàn phím,flagship,Đồng Nai,34,17,4.9,0.85
+user_007,male,26-35,prod_hdd_009,Ổ cứng HDD,upper mid-range,TP. Hồ Chí Minh,14,7,3.8,0.35
+user_007,male,26-35,prod_ups_009,Bộ lưu điện (UPS),flagship,TP. Hồ Chí Minh,32,16,4.8,0.8
+user_007,male,26-35,prod_adapter_010,Bộ chuyển đổi (Adapter),premium,TP. Hồ Chí Minh,21,11,4.4,0.55
+user_008,female,18-25,prod_desk_010,Bàn máy tính,flagship,Bắc Ninh,28,14,4.6,0.7
+user_008,female,18-25,prod_capture_010,Card ghi hình,upper mid-range,Bắc Ninh,17,8,4.0,0.4
+user_008,female,18-25,prod_portable_hdd_010,Ổ cứng di động,flagship,Bắc Ninh,30,15,4.7,0.75
+user_009,male,36-50,prod_dock_010,Dock mở rộng cổng,premium,Nghệ An,22,11,4.4,0.55
+user_009,male,36-50,prod_fan_010,Quạt case,upper mid-range,Nghệ An,15,7,3.9,0.35
+user_009,male,36-50,prod_memory_011,Thẻ nhớ,flagship,Nghệ An,33,17,4.9,0.85
+user_010,female,26-35,prod_keyboard_011,Bàn phím,premium,Hưng Yên,25,13,4.6,0.65
+user_010,female,26-35,prod_mouse_011,Chuột,flagship,Hưng Yên,36,18,4.9,0.9
+user_010,female,26-35,prod_monitor_011,Màn hình,upper mid-range,Hưng Yên,19,10,4.3,0.5
+user_011,male,18-25,prod_speaker_011,Loa,premium,Khánh Hòa,23,12,4.5,0.6
+user_011,male,18-25,prod_webcam_011,Webcam,flagship,Khánh Hòa,31,16,4.8,0.8
+user_011,male,18-25,prod_ssd_011,Ổ cứng SSD,upper mid-range,Khánh Hòa,17,8,4.0,0.4
+user_012,female,50+,prod_chair_011,Ghế gaming,flagship,Lâm Đồng,35,18,4.9,0.9
+user_012,female,50+,prod_mousepad_011,Lót chuột,premium,Lâm Đồng,21,11,4.4,0.55
+user_012,female,50+,prod_psu_011,Nguồn máy tính,upper mid-range,Lâm Đồng,16,8,4.1,0.4
+user_013,male,26-35,prod_mic_011,Microphone,flagship,Quảng Ninh,29,15,4.7,0.75
+user_013,male,26-35,prod_cable_011,Cáp kết nối,premium,Quảng Ninh,20,10,4.3,0.5
+user_013,male,26-35,prod_cooler_011,Tản nhiệt CPU,upper mid-range,Quảng Ninh,14,7,3.9,0.35
+user_014,female,36-50,prod_usb_011,USB,flagship,Thanh Hóa,32,16,4.8,0.8
+user_014,female,36-50,prod_vr_011,Kính VR,premium,Thanh Hóa,24,12,4.5,0.6
+user_014,female,36-50,prod_controller_011,Tay cầm chơi game,upper mid-range,Thanh Hóa,18,9,4.2,0.45
+user_015,male,18-25,prod_hdd_011,Ổ cứng HDD,flagship,Hà Tĩnh,33,17,4.9,0.85
+user_015,male,18-25,prod_ups_011,Bộ lưu điện (UPS),premium,Hà Tĩnh,22,11,4.4,0.55
+user_015,male,18-25,prod_adapter_011,Bộ chuyển đổi (Adapter),upper mid-range,Hà Tĩnh,15,7,3.9,0.35
+user_016,female,26-35,prod_desk_011,Bàn máy tính,flagship,Thái Nguyên,30,15,4.7,0.75
+user_016,female,26-35,prod_capture_011,Card ghi hình,premium,Thái Nguyên,21,11,4.4,0.55
+user_016,female,26-35,prod_dock_011,Dock mở rộng cổng,upper mid-range,Thái Nguyên,17,8,4.0,0.4
+user_017,male,36-50,prod_fan_011,Quạt case,flagship,Sơn La,28,14,4.6,0.7
+user_017,male,36-50,prod_memory_012,Thẻ nhớ,premium,Sơn La,19,10,4.3,0.5
+user_017,male,36-50,prod_portable_hdd_011,Ổ cứng di động,upper mid-range,Sơn La,13,6,3.8,0.3
+user_018,female,18-25,prod_keyboard_012,Bàn phím,flagship,Tây Ninh,34,17,4.9,0.85
+user_018,female,18-25,prod_mouse_012,Chuột,premium,Tây Ninh,23,12,4.5,0.6
+user_018,female,18-25,prod_monitor_012,Màn hình,upper mid-range,Tây Ninh,16,8,4.1,0.4
+user_019,male,50+,prod_headset_012,Tai nghe,flagship,Cao Bằng,31,16,4.8,0.8
+user_019,male,50+,prod_speaker_012,Loa,premium,Cao Bằng,22,11,4.4,0.55
+user_019,male,50+,prod_webcam_012,Webcam,upper mid-range,Cao Bằng,14,7,3.9,0.35
+user_020,female,26-35,prod_ssd_012,Ổ cứng SSD,flagship,Điện Biên,33,17,4.9,0.85
+user_020,female,26-35,prod_chair_012,Ghế gaming,premium,Điện Biên,25,13,4.6,0.65
+user_020,female,26-35,prod_mousepad_012,Lót chuột,upper mid-range,Điện Biên,18,9,4.2,0.45
+user_021,female,36-50,prod_psu_012,Nguồn máy tính,flagship,Đắk Lắk,30,15,4.7,0.75
+user_021,female,36-50,prod_mic_012,Microphone,premium,Đắk Lắk,21,11,4.4,0.55
+user_021,female,36-50,prod_cable_012,Cáp kết nối,upper mid-range,Đắk Lắk,15,7,3.9,0.35
+user_022,male,18-25,prod_cooler_012,Tản nhiệt CPU,flagship,Gia Lai,32,16,4.8,0.8
+user_022,male,18-25,prod_usb_012,USB,premium,Gia Lai,24,12,4.5,0.6
+user_022,male,18-25,prod_vr_012,Kính VR,upper mid-range,Gia Lai,17,8,4.0,0.4
+user_023,female,26-35,prod_controller_012,Tay cầm chơi game,flagship,Lạng Sơn,29,15,4.7,0.75
+user_023,female,26-35,prod_hdd_012,Ổ cứng HDD,premium,Lạng Sơn,20,10,4.3,0.5
+user_023,female,26-35,prod_ups_012,Bộ lưu điện (UPS),upper mid-range,Lạng Sơn,13,6,3.8,0.3
+user_024,male,36-50,prod_adapter_012,Bộ chuyển đổi (Adapter),flagship,Ninh Bình,35,18,4.9,0.9
+user_024,male,36-50,prod_desk_012,Bàn máy tính,premium,Ninh Bình,26,13,4.6,0.65
+user_024,male,36-50,prod_capture_012,Card ghi hình,upper mid-range,Ninh Bình,19,10,4.3,0.5
+user_025,female,18-25,prod_dock_012,Dock mở rộng cổng,flagship,Phú Thọ,33,17,4.9,0.85
+user_025,female,18-25,prod_fan_012,Quạt case,premium,Phú Thọ,22,11,4.4,0.55
+user_025,female,18-25,prod_memory_013,Thẻ nhớ,upper mid-range,Phú Thọ,16,8,4.1,0.4
+user_026,male,50+,prod_portable_hdd_012,Ổ cứng di động,flagship,Quảng Ngãi,31,16,4.8,0.8
+user_026,male,50+,prod_keyboard_013,Bàn phím,premium,Quảng Ngãi,25,13,4.6,0.65
+user_026,male,50+,prod_mouse_013,Chuột,upper mid-range,Quảng Ngãi,18,9,4.2,0.45
+user_027,female,26-35,prod_monitor_013,Màn hình,flagship,Quảng Trị,36,18,4.9,0.9
+user_027,female,26-35,prod_headset_013,Tai nghe,premium,Quảng Trị,27,14,4.6,0.7
+user_027,female,26-35,prod_speaker_013,Loa,upper mid-range,Quảng Trị,19,10,4.3,0.5
+user_028,male,18-25,prod_webcam_013,Webcam,flagship,Thừa Thiên Huế,33,17,4.9,0.85
+user_028,male,18-25,prod_ssd_013,Ổ cứng SSD,premium,Thừa Thiên Huế,24,12,4.5,0.6
+user_028,male,18-25,prod_chair_013,Ghế gaming,upper mid-range,Thừa Thiên Huế,17,8,4.0,0.4
+user_029,male,26-35,prod_mousepad_013,Lót chuột,flagship,Tuyên Quang,30,15,4.7,0.75
+user_029,male,26-35,prod_psu_013,Nguồn máy tính,premium,Tuyên Quang,21,11,4.4,0.55
+user_029,male,26-35,prod_mic_013,Microphone,upper mid-range,Tuyên Quang,14,7,3.9,0.35
+user_030,female,36-50,prod_cable_013,Cáp kết nối,flagship,Vĩnh Long,32,16,4.8,0.8
+user_030,female,36-50,prod_cooler_013,Tản nhiệt CPU,premium,Vĩnh Long,23,12,4.5,0.6
+user_030,female,36-50,prod_usb_013,USB,upper mid-range,Vĩnh Long,16,8,4.1,0.4
+user_031,female,50+,prod_vr_013,Kính VR,flagship,Đắk Nông,35,18,4.9,0.9
+user_031,female,50+,prod_controller_013,Tay cầm chơi game,premium,Đắk Nông,26,13,4.6,0.65
+user_031,female,50+,prod_hdd_013,Ổ cứng HDD,upper mid-range,Đắk Nông,18,9,4.2,0.45
+user_032,male,26-35,prod_ups_013,Bộ lưu điện (UPS),flagship,Lào Cai,34,17,4.9,0.85
+user_032,male,26-35,prod_adapter_013,Bộ chuyển đổi (Adapter),premium,Lào Cai,25,13,4.6,0.65
+user_032,male,26-35,prod_desk_013,Bàn máy tính,upper mid-range,Lào Cai,19,10,4.3,0.5
+user_033,female,18-25,prod_capture_013,Card ghi hình,flagship,An Giang,31,16,4.8,0.8
+user_033,female,18-25,prod_dock_013,Dock mở rộng cổng,premium,An Giang,22,11,4.4,0.55
+user_033,female,18-25,prod_fan_013,Quạt case,upper mid-range,An Giang,15,7,3.9,0.35
+user_034,male,36-50,prod_memory_014,Thẻ nhớ,flagship,Cà Mau,28,14,4.6,0.7
+user_034,male,36-50,prod_portable_hdd_013,Ổ cứng di động,premium,Cà Mau,20,10,4.3,0.5
+user_034,male,36-50,prod_keyboard_014,Bàn phím,upper mid-range,Cà Mau,13,6,3.8,0.3
+user_035,female,26-35,prod_mouse_014,Chuột,flagship,Đồng Tháp,33,17,4.9,0.85
+user_035,female,26-35,prod_monitor_014,Màn hình,premium,Đồng Tháp,24,12,4.5,0.6
+user_035,female,26-35,prod_headset_014,Tai nghe,upper mid-range,Đồng Tháp,17,8,4.0,0.4
+user_081,male,18-25,prod_speaker_014,Loa,flagship,Hà Nội,32,16,4.8,0.8
+user_082,female,26-35,prod_webcam_014,Webcam,premium,TP. Hồ Chí Minh,23,12,4.5,0.6
+user_083,male,36-50,prod_ssd_014,Ổ cứng SSD,flagship,Đà Nẵng,35,18,4.9,0.9
+user_084,female,18-25,prod_chair_014,Ghế gaming,premium,Cần Thơ,26,13,4.6,0.65
+user_085,male,50+,prod_mousepad_014,Lót chuột,upper mid-range,Bắc Ninh,18,9,4.2,0.45
+user_086,female,26-35,prod_psu_014,Nguồn máy tính,flagship,Đồng Nai,34,17,4.9,0.85
+user_087,male,18-25,prod_mic_014,Microphone,premium,Nghệ An,25,13,4.6,0.65
+user_088,female,36-50,prod_cable_014,Cáp kết nối,upper mid-range,Hưng Yên,19,10,4.3,0.5
+user_089,male,26-35,prod_cooler_014,Tản nhiệt CPU,flagship,Khánh Hòa,33,17,4.9,0.85
+user_090,female,18-25,prod_usb_014,USB,premium,Thanh Hóa,22,11,4.4,0.55
+user_091,male,50+,prod_vr_014,Kính VR,flagship,Lâm Đồng,37,19,5.0,0.95
+user_092,female,26-35,prod_controller_014,Tay cầm chơi game,premium,Quảng Ninh,24,12,4.5,0.6
+user_093,male,36-50,prod_hdd_014,Ổ cứng HDD,upper mid-range,Hà Tĩnh,16,8,4.0,0.4
+user_094,female,18-25,prod_ups_014,Bộ lưu điện (UPS),flagship,Thái Nguyên,32,16,4.8,0.8
+user_095,male,26-35,prod_mousepad_017,Lót chuột,upper mid-range,Sơn La,19,10,4.3,0.5
+user_096,female,50+,prod_psu_017,Nguồn máy tính,flagship,Tây Ninh,31,16,4.8,0.8
+user_097,male,18-25,prod_mic_017,Microphone,premium,Cao Bằng,22,11,4.4,0.55
+user_098,female,36-50,prod_cable_017,Cáp kết nối,upper mid-range,Điện Biên,16,8,4.1,0.4
+user_099,male,26-35,prod_cooler_017,Tản nhiệt CPU,flagship,Đắk Lắk,29,15,4.7,0.75
+user_100,female,18-25,prod_usb_017,USB,premium,Gia Lai,20,10,4.3,0.5
+user_001,male,26-35,prod_vr_017,Kính VR,flagship,Hà Nội,38,19,5.0,0.95
+user_002,female,18-25,prod_controller_017,Tay cầm chơi game,premium,TP. Hồ Chí Minh,24,12,4.5,0.6
+user_003,male,36-50,prod_hdd_017,Ổ cứng HDD,upper mid-range,Đà Nẵng,17,8,4.0,0.4
+user_004,female,26-35,prod_ups_017,Bộ lưu điện (UPS),flagship,Cần Thơ,32,16,4.8,0.8
+user_005,male,18-25,prod_adapter_017,Bộ chuyển đổi (Adapter),premium,Bắc Ninh,21,11,4.4,0.55
+user_006,female,50+,prod_desk_017,Bàn máy tính,flagship,Đồng Nai,28,14,4.6,0.7
+user_007,male,26-35,prod_capture_017,Card ghi hình,upper mid-range,Nghệ An,15,7,3.9,0.35
+user_008,female,18-25,prod_dock_017,Dock mở rộng cổng,flagship,Hưng Yên,32,16,4.8,0.8
+user_009,male,36-50,prod_fan_017,Quạt case,premium,Khánh Hòa,22,11,4.4,0.55
+user_010,female,26-35,prod_memory_017,Thẻ nhớ,upper mid-range,Thanh Hóa,14,7,3.9,0.35
+user_011,male,18-25,prod_portable_hdd_017,Ổ cứng di động,flagship,Lâm Đồng,30,15,4.7,0.75
+user_012,female,50+,prod_keyboard_018,Bàn phím,premium,Quảng Ninh,23,12,4.5,0.6
+user_013,male,26-35,prod_mouse_018,Chuột,flagship,Hà Tĩnh,34,17,4.9,0.85
+user_014,female,36-50,prod_monitor_018,Màn hình,premium,Thái Nguyên,25,13,4.6,0.65
+user_015,male,18-25,prod_headset_018,Tai nghe,upper mid-range,Sơn La,18,9,4.2,0.45
+user_016,female,26-35,prod_speaker_018,Loa,flagship,Tây Ninh,32,16,4.8,0.8
+user_017,male,36-50,prod_webcam_018,Webcam,premium,Cao Bằng,21,11,4.4,0.55
+user_018,female,18-25,prod_ssd_018,Ổ cứng SSD,flagship,Điện Biên,33,17,4.9,0.85
+user_019,male,50+,prod_chair_018,Ghế gaming,premium,Đắk Lắk,26,13,4.6,0.65
+user_020,female,26-35,prod_mousepad_018,Lót chuột,upper mid-range,Gia Lai,19,10,4.3,0.5
+user_021,female,36-50,prod_psu_018,Nguồn máy tính,flagship,Lạng Sơn,31,16,4.8,0.8
+user_022,male,18-25,prod_mic_018,Microphone,premium,Lào Cai,22,11,4.4,0.55
+user_023,female,26-35,prod_cable_018,Cáp kết nối,upper mid-range,Ninh Bình,16,8,4.1,0.4
+user_024,male,36-50,prod_cooler_018,Tản nhiệt CPU,flagship,Phú Thọ,29,15,4.7,0.75
+user_025,female,18-25,prod_usb_018,USB,premium,Quảng Ngãi,20,10,4.3,0.5
+user_026,male,50+,prod_vr_018,Kính VR,flagship,Quảng Trị,35,18,4.9,0.9
+user_027,female,26-35,prod_controller_018,Tay cầm chơi game,premium,Thừa Thiên Huế,23,12,4.5,0.6
+user_028,male,18-25,prod_hdd_018,Ổ cứng HDD,upper mid-range,Tuyên Quang,17,8,4.0,0.4
+user_029,male,26-35,prod_ups_018,Bộ lưu điện (UPS),flagship,Vĩnh Long,32,16,4.8,0.8
+user_030,female,36-50,prod_adapter_018,Bộ chuyển đổi (Adapter),premium,Đắk Nông,21,11,4.4,0.55
+user_031,female,50+,prod_desk_018,Bàn máy tính,flagship,An Giang,28,14,4.6,0.7
+user_032,male,26-35,prod_capture_018,Card ghi hình,upper mid-range,Cà Mau,15,7,3.9,0.35
+user_033,female,18-25,prod_dock_018,Dock mở rộng cổng,flagship,Đồng Tháp,30,15,4.7,0.75
+user_034,male,36-50,prod_fan_018,Quạt case,premium,Lai Châu,22,11,4.4,0.55
+user_035,female,26-35,prod_memory_018,Thẻ nhớ,upper mid-range,Hà Nội,14,7,3.9,0.35
+user_036,male,18-25,prod_portable_hdd_018,Ổ cứng di động,flagship,TP. Hồ Chí Minh,31,16,4.8,0.8
+user_037,female,50+,prod_keyboard_019,Bàn phím,premium,Đà Nẵng,24,12,4.5,0.6
+user_038,male,26-35,prod_mouse_019,Chuột,flagship,Cần Thơ,33,17,4.9,0.85
+user_039,female,36-50,prod_monitor_019,Màn hình,premium,Bắc Ninh,25,13,4.6,0.65
+user_040,male,18-25,prod_headset_019,Tai nghe,upper mid-range,Bắc Ninh,18,9,4.2,0.45
+user_041,female,26-35,prod_speaker_019,Loa,flagship,Nghệ An,32,16,4.8,0.8
+user_042,male,36-50,prod_webcam_019,Webcam,premium,Hưng Yên,21,11,4.4,0.55
+user_043,female,18-25,prod_ssd_019,Ổ cứng SSD,flagship,Khánh Hòa,34,17,4.9,0.85
+user_044,male,50+,prod_chair_019,Ghế gaming,premium,Thanh Hóa,26,13,4.6,0.65
+user_045,female,26-35,prod_mousepad_019,Lót chuột,upper mid-range,Lâm Đồng,19,10,4.3,0.5
+user_046,male,18-25,prod_psu_019,Nguồn máy tính,flagship,Quảng Ninh,30,15,4.7,0.75
+user_047,female,36-50,prod_mic_019,Microphone,premium,Hà Tĩnh,22,11,4.4,0.55
+user_048,male,26-35,prod_cable_019,Cáp kết nối,upper mid-range,Thái Nguyên,16,8,4.1,0.4
+user_049,female,18-25,prod_cooler_019,Tản nhiệt CPU,flagship,Sơn La,29,15,4.7,0.75
+user_050,male,50+,prod_usb_019,USB,premium,Tây Ninh,20,10,4.3,0.5
+user_051,male,18-25,prod_vr_019,Kính VR,flagship,Cao Bằng,36,18,4.9,0.9
+user_052,female,26-35,prod_controller_019,Tay cầm chơi game,premium,Điện Biên,23,12,4.5,0.6
+user_053,male,36-50,prod_hdd_019,Ổ cứng HDD,upper mid-range,Đắk Lắk,17,8,4.0,0.4
+user_054,female,18-25,prod_ups_019,Bộ lưu điện (UPS),flagship,Gia Lai,30,15,4.7,0.75
+user_055,male,50+,prod_adapter_019,Bộ chuyển đổi (Adapter),premium,Lạng Sơn,21,11,4.4,0.55
+user_056,female,26-35,prod_desk_019,Bàn máy tính,flagship,Lào Cai,28,14,4.6,0.7
+user_057,male,18-25,prod_capture_019,Card ghi hình,upper mid-range,Ninh Bình,15,7,3.9,0.35
+user_058,female,36-50,prod_dock_019,Dock mở rộng cổng,flagship,Phú Thọ,32,16,4.8,0.8
+user_059,male,26-35,prod_fan_019,Quạt case,premium,Quảng Ngãi,22,11,4.4,0.55
+user_060,female,18-25,prod_memory_019,Thẻ nhớ,upper mid-range,Quảng Trị,14,7,3.9,0.35
+user_061,male,18-25,prod_portable_hdd_019,Ổ cứng di động,flagship,Thừa Thiên Huế,30,15,4.7,0.75
+user_062,female,36-50,prod_keyboard_020,Bàn phím,premium,Tuyên Quang,23,12,4.5,0.6
+user_063,male,26-35,prod_mouse_020,Chuột,flagship,Vĩnh Long,33,17,4.9,0.85
+user_064,female,18-25,prod_monitor_020,Màn hình,premium,Đắk Nông,25,13,4.6,0.65
+user_065,male,50+,prod_headset_020,Tai nghe,upper mid-range,An Giang,18,9,4.2,0.45
+user_066,female,26-35,prod_speaker_020,Loa,flagship,Cà Mau,32,16,4.8,0.8
+user_067,male,18-25,prod_webcam_020,Webcam,premium,Đồng Tháp,21,11,4.4,0.55
+user_068,female,36-50,prod_ssd_020,Ổ cứng SSD,flagship,Lai Châu,34,17,4.9,0.85
+user_069,male,26-35,prod_chair_020,Ghế gaming,premium,Hà Nội,26,13,4.6,0.65
+user_070,female,18-25,prod_mousepad_020,Lót chuột,upper mid-range,TP. Hồ Chí Minh,19,10,4.3,0.5
+user_071,male,18-25,prod_psu_020,Nguồn máy tính,flagship,Đà Nẵng,31,16,4.8,0.8
+user_072,female,26-35,prod_mic_020,Microphone,premium,Cần Thơ,22,11,4.4,0.55
+user_073,male,36-50,prod_cable_020,Cáp kết nối,upper mid-range,Bắc Ninh,16,8,4.1,0.4
+user_074,female,18-25,prod_cooler_020,Tản nhiệt CPU,flagship,Đồng Nai,29,15,4.7,0.75
+user_075,male,50+,prod_usb_020,USB,premium,Nghệ An,20,10,4.3,0.5
+user_076,female,26-35,prod_vr_020,Kính VR,flagship,Hưng Yên,35,18,4.9,0.9
+user_077,male,18-25,prod_controller_020,Tay cầm chơi game,premium,Khánh Hòa,23,12,4.5,0.6
+user_078,female,36-50,prod_hdd_020,Ổ cứng HDD,upper mid-range,Thanh Hóa,17,8,4.0,0.4
+user_079,male,26-35,prod_ups_020,Bộ lưu điện (UPS),flagship,Lâm Đồng,32,16,4.8,0.8
+user_080,female,18-25,prod_adapter_020,Bộ chuyển đổi (Adapter),premium,Quảng Ninh,21,11,4.4,0.55
