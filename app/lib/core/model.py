@@ -64,7 +64,8 @@ class WideAndDeepModel(tfrs.Model):
             loss=tf.keras.losses.MeanSquaredError(),
             metrics=[
                 tf.keras.metrics.RootMeanSquaredError(),
-                tf.keras.metrics.MeanAbsoluteError()
+                tf.keras.metrics.MeanAbsoluteError(),
+                tf.keras.metrics.R2Score(name="r2_score")
             ],
             name="ranking_task"
         )

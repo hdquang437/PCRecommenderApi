@@ -160,28 +160,73 @@ def train_model():
 
         # Check prediction vs label correlation
         correlation = np.corrcoef(predictions.numpy().flatten(), sample_labels)[0,1] if len(sample_labels) > 1 else 0.0
-        print(f"Prediction-Label correlation: {correlation:.4f}")        # Save new model
+        print(f"Prediction-Label correlation: {correlation:.4f}")
+        
+        # Calculate R² score manually for verification
+        def calculate_r2_score(y_true, y_pred):
+            """Calculate R² score manually"""
+            y_true_mean = np.mean(y_true)
+            ss_res = np.sum((y_true - y_pred) ** 2)
+            ss_tot = np.sum((y_true - y_true_mean) ** 2)
+            return 1 - (ss_res / ss_tot) if ss_tot > 0 else 0.0
+        
+        r2_score = calculate_r2_score(sample_labels, predictions.numpy().flatten())
+        print(f"R² Score: {r2_score:.4f}")
+        
+        # Calculate prediction quality metrics
+        prediction_variance = float(predictions.numpy().var())
+        label_variance = float(sample_labels.var())
+        mean_absolute_difference = float(np.mean(np.abs(predictions.numpy().flatten() - sample_labels)))
+        
+        print(f"Prediction variance: {prediction_variance:.4f}")
+        print(f"Label variance: {label_variance:.4f}")
+        print(f"Mean absolute difference: {mean_absolute_difference:.4f}")
+        
+        # Save new model
 
         return {
             "status": "success",
-            "train_size": train_size,
-            "test_size": test_size,
-            "train_steps": train_steps,
-            "val_steps": val_steps,
+            "train_size": int(train_size),
+            "test_size": int(test_size),
+            "train_steps": int(train_steps),
+            "val_steps": int(val_steps),
             "final_loss": float(history.history['loss'][-1]),
             #"final_val_loss": float(history.history.get('val_loss', [0])[-1]) if 'val_loss' in history.history else None,
             "final_rmse": float(history.history.get('root_mean_squared_error', [0])[-1]) if 'root_mean_squared_error' in history.history else None,
             "final_mae": float(history.history.get('mean_absolute_error', [0])[-1]) if 'mean_absolute_error' in history.history else None,
+            "final_r2_score": float(history.history.get('r2_score', [0])[-1]) if 'r2_score' in history.history else None,
             "prediction_range": f"{predictions.numpy().min():.4f} - {predictions.numpy().max():.4f}",
             "label_range": f"{sample_labels.min():.4f} - {sample_labels.max():.4f}",
             "correlation": float(correlation) if 'correlation' in locals() else None,
-            "epochs_trained": len(history.history['loss']),
+            "r2_score_manual": float(r2_score) if 'r2_score' in locals() else None,
+            "epochs_trained": int(len(history.history['loss'])),
             "training_mode": "incremental" if incremental_training else "from_scratch",
-            "learning_rate": learning_rate,
+            "learning_rate": float(learning_rate),
             "wide_weight": float(model.wide_weight.numpy()),
             "deep_weight": float(model.deep_weight.numpy()),
             "wide_deep_ratio": float(model.wide_weight.numpy() / (model.wide_weight.numpy() + model.deep_weight.numpy())),
-            "note": "Model trained with engagement score (continuous) successfully"
+            
+            # Enhanced prediction quality metrics for comparison
+            "prediction_variance": float(prediction_variance) if 'prediction_variance' in locals() else None,
+            "label_variance": float(label_variance) if 'label_variance' in locals() else None,
+            "mean_absolute_difference": float(mean_absolute_difference) if 'mean_absolute_difference' in locals() else None,
+            "prediction_mean": float(predictions.numpy().mean()),
+            "prediction_std": float(predictions.numpy().std()),
+            "label_mean": float(sample_labels.mean()),
+            "label_std": float(sample_labels.std()),
+            
+            # Model architecture info for comparison
+            "model_architecture": "wide_deep_baseline",
+            "attention_analysis": None,  # No attention in baseline model
+            
+            # Training performance indicators
+            "training_efficiency": {
+                "final_loss_improvement": float(history.history['loss'][0] - history.history['loss'][-1]) if len(history.history['loss']) > 1 else 0.0,
+                "best_epoch": int(np.argmin(history.history['loss'])) + 1,
+                "convergence_rate": float(np.mean(np.diff(history.history['loss']))) if len(history.history['loss']) > 1 else 0.0
+            },
+            
+            "note": "Baseline Wide & Deep model (without attention) for comparison"
         }
 
     except Exception as e:
