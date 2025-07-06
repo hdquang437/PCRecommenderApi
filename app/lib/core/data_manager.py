@@ -314,7 +314,7 @@ class DataManager:
             self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 1.0}, inplace=True)
             
             # FIXED NORMALIZATION VALUES - Based on single product interaction patterns
-            FIXED_MAX_BUYS = self.data['buy_times'].max()      # Max purchases of same product (realistic for most items)
+            FIXED_MAX_BUYS = (self.data['buy_times'].mean() + 1e-6) * 0.6      # Max purchases of same product
             # Label chính sử dụng buy_times
             self.data["label"] = (self.data["buy_times"] / FIXED_MAX_BUYS).clip(0, 1)
             
