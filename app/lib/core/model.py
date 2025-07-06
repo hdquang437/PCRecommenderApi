@@ -69,6 +69,13 @@ class WideAndDeepModel(tfrs.Model):
             name="ranking_task"
         )
 
+        self.wide_weight = self.add_weight(
+            name="wide_weight", shape=(), initializer=tf.constant_initializer(0.5), trainable=True
+        )
+        self.deep_weight = self.add_weight(
+            name="deep_weight", shape=(), initializer=tf.constant_initializer(0.5), trainable=True
+        )
+
     def build(self, input_shape):
         """Build the model layers."""
         super(WideAndDeepModel, self).build(input_shape)
@@ -148,9 +155,9 @@ class WideAndDeepModel(tfrs.Model):
         wide_output = self.wide(wide_input)
         deep_output = self.deep(deep_input, training=training)
 
-        # Combine wide và deep outputs theo kiến trúc chuẩn
-        combined_input = tf.concat([wide_output, deep_output], axis=1)
-        combined_output = self.combination_layer(combined_input)
+        # Scale và cộng weighted sum rồi sigmoid
+        combined = self.wide_weight * wide_output + self.deep_weight * deep_output
+        combined_output = tf.keras.activations.sigmoid(combined)
 
         return combined_output
 

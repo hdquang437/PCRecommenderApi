@@ -102,23 +102,6 @@ def train_model():
             model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True, force_new=True)
             incremental_training = False
         
-        # ===== FORCE DISABLE SECTION (COMMENTED OUT FOR TESTING) =====
-        # print("🔄 Incremental training DISABLED - forcing from-scratch for consistent results")
-        # 
-        # # Remove existing model to ensure fresh training
-        # if os.path.exists(model_file):
-        #     try:
-        #         os.remove(model_file)
-        #         print(f"Removed existing model file for fresh training: {model_file}")
-        #     except Exception as e:
-        #         print(f"Warning: Could not remove model file: {e}")
-        # 
-        # # Create fresh model
-        # print("Creating new model from scratch...")
-        # model_manager.model = None  # Reset any cached model
-        # model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True, force_new=True)
-        # incremental_training = False        # Compile with optimized settings for continuous engagement score
-        # Use adaptive learning rate based on training mode
         learning_rate = 0.0002 if incremental_training else 0.0005
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
@@ -158,6 +141,10 @@ def train_model():
         features, labels = sample_batch
         predictions = model(features)
         
+        print("=== WIDE & DEEP WEIGHT ===")
+        print(f"Wide weight: {model.wide_weight.numpy():.4f}")
+        print(f"Deep weight: {model.deep_weight.numpy():.4f}")
+
         # Enhanced analysis for engagement score
         print("=== ENGAGEMENT SCORE ANALYSIS ===")
         print(f"Sample predictions range: {predictions.numpy().min():.4f} - {predictions.numpy().max():.4f}")
@@ -174,7 +161,7 @@ def train_model():
         # Check prediction vs label correlation
         correlation = np.corrcoef(predictions.numpy().flatten(), sample_labels)[0,1] if len(sample_labels) > 1 else 0.0
         print(f"Prediction-Label correlation: {correlation:.4f}")        # Save new model
-        
+
         return {
             "status": "success",
             "train_size": train_size,
@@ -182,7 +169,7 @@ def train_model():
             "train_steps": train_steps,
             "val_steps": val_steps,
             "final_loss": float(history.history['loss'][-1]),
-            "final_val_loss": float(history.history.get('val_loss', [0])[-1]) if 'val_loss' in history.history else None,
+            #"final_val_loss": float(history.history.get('val_loss', [0])[-1]) if 'val_loss' in history.history else None,
             "final_rmse": float(history.history.get('root_mean_squared_error', [0])[-1]) if 'root_mean_squared_error' in history.history else None,
             "final_mae": float(history.history.get('mean_absolute_error', [0])[-1]) if 'mean_absolute_error' in history.history else None,
             "prediction_range": f"{predictions.numpy().min():.4f} - {predictions.numpy().max():.4f}",
@@ -191,6 +178,9 @@ def train_model():
             "epochs_trained": len(history.history['loss']),
             "training_mode": "incremental" if incremental_training else "from_scratch",
             "learning_rate": learning_rate,
+            "wide_weight": float(model.wide_weight.numpy()),
+            "deep_weight": float(model.deep_weight.numpy()),
+            "wide_deep_ratio": float(model.wide_weight.numpy() / (model.wide_weight.numpy() + model.deep_weight.numpy())),
             "note": "Model trained with engagement score (continuous) successfully"
         }
 
