@@ -79,6 +79,12 @@ def train_model():
                 print("Attempting to load existing SAVED model for incremental training...")
                 model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True)
                 print("✅ Loaded existing SAVED model - will continue training")
+                
+                # RESET GATE NETWORK to prevent weight collapse
+                if hasattr(model, 'reset_gate_network'):
+                    model.reset_gate_network()
+                    print("🔄 Gate network reset for fresh incremental training")
+                
                 incremental_training = True
             except Exception as e:
                 print(f"Failed to load saved model: {e}")
@@ -102,7 +108,7 @@ def train_model():
             model = model_manager.load_model(vocab_sizes=vocab_sizes, reload=True, force_new=True)
             incremental_training = False
         
-        learning_rate = 0.0002 if incremental_training else 0.0005
+        learning_rate = 0.0003 if incremental_training else 0.0005  # Increased from 0.0002
         model.compile(
             optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
             run_eagerly=False
@@ -136,14 +142,57 @@ def train_model():
         
         tf.random.set_seed(RANDOM_SEED)  # Reset seed for consistent test sampling
 
-        sample_test_ds = data_manager.get_dataset().batch(BATCH_SIZE)  # Take 50 samples for testing
+        sample_test_ds = data_manager.get_dataset().batch(BATCH_SIZE)  # Take samples for testing
         sample_batch = next(iter(sample_test_ds))
         features, labels = sample_batch
         predictions = model(features)
         
-        print("=== WIDE & DEEP WEIGHT ===")
-        print(f"Wide weight: {model.wide_weight.numpy():.4f}")
-        print(f"Deep weight: {model.deep_weight.numpy():.4f}")
+        # Get dynamic weights for analysis
+        print("=== DYNAMIC WEIGHTS ANALYSIS ===")
+        try:
+            # Get gate input to compute dynamic weights
+            numerical_features = tf.concat([
+                tf.reshape(tf.cast(features["click_times"], tf.float32), (-1, 1)),
+                tf.reshape(tf.cast(features["rating"], tf.float32), (-1, 1))
+            ], axis=1)
+            numerical_features = tf.clip_by_value(numerical_features, 0.0, 10.0) / 10.0
+            
+            # Get embeddings
+            type_indices = tf.clip_by_value(tf.cast(features["type"], tf.int32), 0, model.vocab_sizes["type"] - 1)
+            gender_indices = tf.clip_by_value(tf.cast(features["gender"], tf.int32), 0, model.vocab_sizes["gender"] - 1)
+            age_indices = tf.clip_by_value(tf.cast(features["age_range"], tf.int32), 0, model.vocab_sizes["age_range"] - 1)
+            price_indices = tf.clip_by_value(tf.cast(features["price_range"], tf.int32), 0, model.vocab_sizes["price_range"] - 1)
+            
+            type_embedded = model.type_embedding(type_indices)
+            gender_embedded = model.gender_embedding(gender_indices)
+            age_embedded = model.age_embedding(age_indices)
+            price_embedded = model.price_embedding(price_indices)
+            
+            # Create gate input
+            gate_input_features = tf.concat([
+                numerical_features,
+                tf.reshape(gender_embedded, [-1, 2]),
+                tf.reshape(age_embedded, [-1, 2]),
+                tf.reduce_mean(tf.reshape(type_embedded, [-1, 4]), axis=1, keepdims=True),
+                tf.reduce_mean(tf.reshape(price_embedded, [-1, 2]), axis=1, keepdims=True)
+            ], axis=1)
+            
+            # Get dynamic weights
+            gate_input_projected = model.gate_input_projection(gate_input_features, training=False)
+            dynamic_weights = model.gate_network(gate_input_projected, training=False)
+            
+            # Log dynamic weights statistics
+            wide_weights = dynamic_weights[:, 0].numpy()
+            deep_weights = dynamic_weights[:, 1].numpy()
+            
+            print(f"Wide weights - Mean: {wide_weights.mean():.4f}, Std: {wide_weights.std():.4f}")
+            print(f"Deep weights - Mean: {deep_weights.mean():.4f}, Std: {deep_weights.std():.4f}")
+            print(f"Wide dominant samples: {(wide_weights > deep_weights).sum()}/{len(wide_weights)}")
+            print(f"Sample weights (first 5): Wide={wide_weights[:5]}, Deep={deep_weights[:5]}")
+            
+        except Exception as e:
+            print(f"Could not compute dynamic weights: {e}")
+            print("Using Dynamic Weighting - no static weights available")
 
         # Enhanced analysis for engagement score
         print("=== ENGAGEMENT SCORE ANALYSIS ===")
@@ -202,9 +251,11 @@ def train_model():
             "epochs_trained": int(len(history.history['loss'])),
             "training_mode": "incremental" if incremental_training else "from_scratch",
             "learning_rate": float(learning_rate),
-            "wide_weight": float(model.wide_weight.numpy()),
-            "deep_weight": float(model.deep_weight.numpy()),
-            "wide_deep_ratio": float(model.wide_weight.numpy() / (model.wide_weight.numpy() + model.deep_weight.numpy())),
+            "dynamic_weighting": True,  # Model uses dynamic weighting
+            "wide_weight_mean": float(wide_weights.mean()) if 'wide_weights' in locals() else None,
+            "deep_weight_mean": float(deep_weights.mean()) if 'deep_weights' in locals() else None,
+            "wide_weight_std": float(wide_weights.std()) if 'wide_weights' in locals() else None,
+            "deep_weight_std": float(deep_weights.std()) if 'deep_weights' in locals() else None,
             
             # Enhanced prediction quality metrics for comparison
             "prediction_variance": float(prediction_variance) if 'prediction_variance' in locals() else None,
@@ -216,8 +267,8 @@ def train_model():
             "label_std": float(sample_labels.std()),
             
             # Model architecture info for comparison
-            "model_architecture": "wide_deep_baseline",
-            "attention_analysis": None,  # No attention in baseline model
+            "model_architecture": "wide_deep_dynamic_weighting",
+            "attention_analysis": None,  # No attention in this model
             
             # Training performance indicators
             "training_efficiency": {
@@ -226,7 +277,7 @@ def train_model():
                 "convergence_rate": float(np.mean(np.diff(history.history['loss']))) if len(history.history['loss']) > 1 else 0.0
             },
             
-            "note": "Baseline Wide & Deep model (without attention) for comparison"
+            "note": "Wide & Deep model with Dynamic Weighting (Adaptive Gate Network)"
         }
 
     except Exception as e:

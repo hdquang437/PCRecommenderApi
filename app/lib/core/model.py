@@ -70,12 +70,22 @@ class WideAndDeepModel(tfrs.Model):
             name="ranking_task"
         )
 
-        self.wide_weight = self.add_weight(
-            name="wide_weight", shape=(), initializer=tf.constant_initializer(0.5), trainable=True
+        # Dynamic weighting configuration
+        self.use_dynamic_weighting = True
+        
+        # Gate input projection để giảm dimension và tăng stability
+        self.gate_input_projection = layers.Dense(
+            8, activation='relu', name="gate_input_projection",
+            kernel_regularizer=tf.keras.regularizers.l2(0.00001)  # Much lighter
         )
-        self.deep_weight = self.add_weight(
-            name="deep_weight", shape=(), initializer=tf.constant_initializer(0.5), trainable=True
-        )
+        
+        # Gate network for dynamic weighting - more flexible
+        self.gate_network = keras.Sequential([
+            layers.Dense(8, activation='relu', name="gate_hidden",
+                        kernel_regularizer=tf.keras.regularizers.l2(0.00001)),  # Much lighter
+            layers.Dropout(0.02, name="gate_dropout"),  # Much lighter dropout
+            layers.Dense(2, activation='softmax', name="gate_output")
+        ], name="gate_network")
 
     def build(self, input_shape):
         """Build the model layers."""
@@ -156,8 +166,24 @@ class WideAndDeepModel(tfrs.Model):
         wide_output = self.wide(wide_input)
         deep_output = self.deep(deep_input, training=training)
 
-        # Scale và cộng weighted sum rồi sigmoid
-        combined = self.wide_weight * wide_output + self.deep_weight * deep_output
+        # Dynamic weighting using gate network
+        gate_input_features = tf.concat([
+            numerical_features,  # Behavioral signals
+            tf.reshape(gender_embedded, [-1, 2]),  # Demographic
+            tf.reshape(age_embedded, [-1, 2]),     # Demographic
+            tf.reduce_mean(tf.reshape(type_embedded, [-1, 4]), axis=1, keepdims=True),  # Product summary
+            tf.reduce_mean(tf.reshape(price_embedded, [-1, 2]), axis=1, keepdims=True)  # Price summary
+        ], axis=1)
+        
+        # Project gate input and generate dynamic weights
+        gate_input_projected = self.gate_input_projection(gate_input_features, training=training)
+        dynamic_weights = self.gate_network(gate_input_projected, training=training)
+        
+        wide_weight_dynamic = dynamic_weights[:, 0:1]
+        deep_weight_dynamic = dynamic_weights[:, 1:2]
+        
+        # Weighted combination
+        combined = wide_weight_dynamic * wide_output + deep_weight_dynamic * deep_output
         combined_output = tf.keras.activations.sigmoid(combined)
 
         return combined_output
@@ -168,4 +194,56 @@ class WideAndDeepModel(tfrs.Model):
         labels = tf.reshape(labels, [-1, 1])
         predictions = self.call(inputs, training=training)
         
-        return self.task(labels=labels, predictions=predictions)
+        # Base loss
+        base_loss = self.task(labels=labels, predictions=predictions)
+        
+        # Add light gate regularization during training
+        if training:
+            # Get gate input for regularization
+            numerical_features = tf.concat([
+                tf.reshape(tf.cast(inputs["click_times"], tf.float32), (-1, 1)),
+                tf.reshape(tf.cast(inputs["rating"], tf.float32), (-1, 1))
+            ], axis=1)
+            numerical_features = tf.clip_by_value(numerical_features, 0.0, 10.0) / 10.0
+            
+            # Get embeddings
+            type_indices = tf.clip_by_value(tf.cast(inputs["type"], tf.int32), 0, self.vocab_sizes["type"] - 1)
+            gender_indices = tf.clip_by_value(tf.cast(inputs["gender"], tf.int32), 0, self.vocab_sizes["gender"] - 1)
+            age_indices = tf.clip_by_value(tf.cast(inputs["age_range"], tf.int32), 0, self.vocab_sizes["age_range"] - 1)
+            price_indices = tf.clip_by_value(tf.cast(inputs["price_range"], tf.int32), 0, self.vocab_sizes["price_range"] - 1)
+            
+            type_embedded = self.type_embedding(type_indices)
+            gender_embedded = self.gender_embedding(gender_indices)
+            age_embedded = self.age_embedding(age_indices)
+            price_embedded = self.price_embedding(price_indices)
+            
+            # Create gate input
+            gate_input_features = tf.concat([
+                numerical_features,
+                tf.reshape(gender_embedded, [-1, 2]),
+                tf.reshape(age_embedded, [-1, 2]),
+                tf.reduce_mean(tf.reshape(type_embedded, [-1, 4]), axis=1, keepdims=True),
+                tf.reduce_mean(tf.reshape(price_embedded, [-1, 2]), axis=1, keepdims=True)
+            ], axis=1)
+            
+            gate_input_projected = self.gate_input_projection(gate_input_features, training=training)
+            dynamic_weights = self.gate_network(gate_input_projected, training=training)
+            
+            # IMPROVED: Much lighter regularization to encourage diversity
+            weight_entropy = -tf.reduce_mean(
+                tf.reduce_sum(dynamic_weights * tf.math.log(dynamic_weights + 1e-8), axis=1)
+            )
+            
+            # NEW: Encourage weight diversity across samples
+            weight_variance = tf.reduce_mean(tf.math.reduce_variance(dynamic_weights, axis=0))
+            
+            # IMPROVED: Very light regularization
+            gate_regularization = (
+                0.0002 * weight_entropy          # Much lighter
+                - 0.0005 * weight_variance       # Reward diversity
+            )
+            return base_loss + gate_regularization
+        
+        return base_loss
+    
+
