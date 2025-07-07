@@ -1,0 +1,320 @@
+user_id,gender,age_range,product_id,type,price_range,location,click_times,buy_times,rating,label
+user_001,male,26-35,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,12,3,4.2,0.35
+user_001,male,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,18,5,4.3,0.55
+user_001,male,26-35,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,16,5,4.0,0.48
+user_001,male,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,25,8,4.6,0.72
+user_002,female,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,14,4,4.1,0.42
+user_002,female,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,22,12,4.7,0.68
+user_002,female,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,12,3,3.9,0.35
+user_002,female,18-25,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,35,15,4.8,0.85
+user_003,male,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,28,14,4.5,0.78
+user_003,male,36-50,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,25,10,4.4,0.72
+user_003,male,36-50,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,20,8,4.4,0.62
+user_003,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,42,18,4.9,0.88
+user_004,female,26-35,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,15,4,4.0,0.42
+user_004,female,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,16,6,4.2,0.48
+user_004,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,19,7,4.5,0.58
+user_005,male,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,11,3,3.9,0.38
+user_005,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,15,5,4.0,0.45
+user_005,male,18-25,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,35,16,4.7,0.85
+user_006,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,8,2,3.8,0.28
+user_006,female,50+,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,14,4,3.9,0.38
+user_006,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,13,4,4.1,0.42
+user_007,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,24,12,4.6,0.75
+user_007,male,26-35,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,20,7,4.2,0.58
+user_007,male,26-35,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,21,9,4.5,0.68
+user_007,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,45,22,4.9,0.95
+user_008,female,18-25,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,13,4,4.0,0.42
+user_008,female,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,9,2,3.7,0.32
+user_008,female,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,12,3,3.9,0.35
+user_009,male,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,32,16,4.7,0.82
+user_009,male,36-50,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,23,9,4.4,0.68
+user_009,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,38,17,4.8,0.87
+user_010,female,26-35,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,28,12,4.5,0.75
+user_010,female,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,14,5,4.1,0.45
+user_010,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,17,6,4.3,0.52
+user_011,male,18-25,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,17,5,4.1,0.48
+user_011,male,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,26,13,4.6,0.78
+user_011,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,18,6,4.2,0.55
+user_012,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,6,1,3.5,0.22
+user_012,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,10,2,3.8,0.32
+user_012,female,50+,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,7,2,3.5,0.22
+user_013,male,26-35,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,29,14,4.6,0.78
+user_013,male,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,19,6,4.2,0.55
+user_013,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,40,19,4.8,0.92
+user_014,female,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,24,10,4.3,0.68
+user_014,female,36-50,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,15,5,4.2,0.48
+user_014,female,36-50,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,23,10,4.5,0.72
+user_015,male,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,13,3,3.9,0.38
+user_015,male,18-25,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,20,7,4.3,0.62
+user_015,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,16,5,4.0,0.48
+user_016,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,20,7,4.4,0.62
+user_016,female,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,22,11,4.5,0.72
+user_016,female,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,34,15,4.6,0.82
+user_017,male,36-50,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,18,6,4.1,0.52
+user_017,male,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,31,15,4.7,0.82
+user_017,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,44,20,4.9,0.93
+user_018,female,18-25,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,10,2,3.8,0.32
+user_018,female,18-25,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,12,4,4.0,0.42
+user_018,female,18-25,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,21,8,4.3,0.62
+user_019,male,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,22,8,4.4,0.65
+user_019,male,26-35,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,25,11,4.6,0.75
+user_019,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,48,23,4.9,0.96
+user_020,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,8,2,3.7,0.28
+user_020,female,50+,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,12,3,3.8,0.32
+user_020,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,7,1,3.6,0.25
+user_021,male,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,27,14,4.7,0.82
+user_021,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,19,6,4.1,0.52
+user_022,female,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,16,5,4.2,0.48
+user_022,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,18,6,4.3,0.55
+user_023,male,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,33,17,4.8,0.85
+user_023,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,41,19,4.9,0.92
+user_024,female,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,11,3,3.9,0.38
+user_024,female,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,14,4,4.0,0.42
+user_025,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,24,12,4.6,0.75
+user_025,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,46,21,4.8,0.94
+user_026,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,5,1,3.4,0.18
+user_026,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,9,2,3.7,0.28
+user_026,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,6,1,3.5,0.22
+user_027,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,17,5,4.1,0.48
+user_027,male,18-25,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,22,9,4.4,0.68
+user_028,female,26-35,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,26,12,4.4,0.72
+user_028,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,21,8,4.5,0.68
+user_029,male,36-50,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,39,18,4.8,0.88
+user_029,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,43,20,4.9,0.93
+user_030,female,18-25,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,11,2,3.8,0.32
+user_030,female,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,12,3,3.9,0.38
+user_031,male,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,23,10,4.6,0.75
+user_031,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,28,15,4.7,0.85
+user_032,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,8,2,3.6,0.25
+user_032,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,6,1,3.5,0.22
+user_032,female,50+,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,9,2,3.7,0.28
+user_033,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,20,6,4.2,0.55
+user_033,male,18-25,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,24,10,4.5,0.72
+user_034,female,26-35,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,27,13,4.5,0.78
+user_034,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,19,7,4.3,0.58
+user_035,male,36-50,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,47,22,4.9,0.95
+user_035,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,42,19,4.8,0.92
+user_036,female,18-25,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,13,3,4.0,0.38
+user_036,female,18-25,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,15,4,4.1,0.45
+user_036,female,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,18,6,4.2,0.52
+user_037,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,29,16,4.8,0.88
+user_037,male,26-35,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,26,12,4.6,0.78
+user_038,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,9,2,3.7,0.28
+user_038,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,7,1,3.5,0.22
+user_038,female,50+,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,11,3,3.8,0.32
+user_039,male,18-25,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,25,11,4.4,0.72
+user_039,male,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,21,7,4.3,0.62
+user_040,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,22,9,4.5,0.72
+user_040,female,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,27,12,4.5,0.75
+user_041,male,18-25,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,31,14,4.7,0.82
+user_041,male,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,28,13,4.6,0.78
+user_041,male,18-25,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,42,19,4.9,0.92
+user_042,female,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,19,7,4.3,0.58
+user_042,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,23,9,4.4,0.68
+user_042,female,26-35,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,36,16,4.7,0.85
+user_043,male,36-50,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,17,5,4.0,0.48
+user_043,male,36-50,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,22,8,4.2,0.58
+user_043,male,36-50,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,26,11,4.5,0.72
+user_044,female,18-25,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,14,4,4.0,0.42
+user_044,female,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,25,11,4.5,0.72
+user_044,female,18-25,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,33,15,4.6,0.82
+user_045,male,26-35,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,29,13,4.6,0.78
+user_045,male,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,21,8,4.3,0.62
+user_045,male,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,24,10,4.4,0.68
+user_046,female,50+,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,6,1,3.4,0.18
+user_046,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,8,2,3.6,0.25
+user_046,female,50+,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,10,3,3.7,0.28
+user_047,male,36-50,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,32,15,4.7,0.82
+user_047,male,36-50,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,38,17,4.7,0.88
+user_047,male,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,41,18,4.8,0.92
+user_048,female,18-25,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,15,4,4.1,0.45
+user_048,female,18-25,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,18,6,4.2,0.52
+user_048,female,18-25,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,16,5,4.0,0.48
+user_049,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,30,14,4.7,0.82
+user_049,male,26-35,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,27,12,4.5,0.75
+user_049,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,39,18,4.8,0.88
+user_050,female,36-50,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,17,5,4.1,0.48
+user_050,female,36-50,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,13,3,3.9,0.38
+user_050,female,36-50,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,34,15,4.6,0.82
+user_051,male,18-25,0QDKpIgbTrByDey73USE,Ổ cứng SSD,premium,TP. Hồ Chí Minh,35,16,4.7,0.85
+user_051,male,18-25,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,38,18,4.8,0.89
+user_051,male,18-25,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,48,24,4.9,0.96
+user_051,male,18-25,3VGYS7UIcAdwBI3LIBXU,Bàn phím,premium,Đà Nẵng,40,19,4.8,0.91
+user_051,male,18-25,7w7kZbVk0wQeuM9ls4sT,Kính VR,flagship,Đà Nẵng,52,28,5.0,0.98
+user_052,female,26-35,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,29,12,4.4,0.73
+user_052,female,26-35,0k4q7TLI76lSGMSjdvPN,Loa,premium,Hà Nội,32,14,4.6,0.79
+user_052,female,26-35,3l1J8i4vJtRUvqGeGuzc,Bàn máy tính,premium,TP. Hồ Chí Minh,43,20,4.8,0.9
+user_052,female,26-35,6HWzNFD676rte1AwMYHG,Microphone,flagship,Hà Nội,45,22,4.9,0.93
+user_052,female,26-35,BhvIYC99nI4T0yDlubwc,Bàn máy tính,premium,Đà Nẵng,41,19,4.7,0.87
+user_053,male,36-50,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,19,7,4.1,0.52
+user_053,male,36-50,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,22,8,4.2,0.58
+user_053,male,36-50,1bW4EHdz2REf9xO5TtGR,Quạt case,upper mid-range,Đà Nẵng,25,10,4.3,0.65
+user_053,male,36-50,3aZhR1AV5g5rWdhEi9yE,Nguồn máy tính,premium,Đà Nẵng,41,18,4.7,0.87
+user_053,male,36-50,5Xi8utWXh5Q2vEYKK2Ak,Bộ lưu điện (UPS),premium,Đà Nẵng,44,20,4.8,0.91
+user_054,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,11,3,3.7,0.28
+user_054,female,50+,7N7bFoJ1VwF1YLZT425e,Cáp kết nối,mid-range,Hà Nội,13,4,3.8,0.32
+user_054,female,50+,C7Aj5XYnn0efjPsqmXaY,Tay cầm chơi game,upper mid-range,Hà Nội,15,5,3.9,0.36
+user_054,female,50+,DB61SQ8C1I23r4x63f4I,Microphone,upper mid-range,Đà Nẵng,17,6,4.0,0.4
+user_054,female,50+,DP0CnR4ls4s3xJm7Btjx,Thẻ nhớ,mid-range,Hà Nội,8,2,3.5,0.22
+user_055,male,18-25,7psT7UUtDRjyV1CmznLp,Ổ cứng SSD,premium,Hà Nội,34,15,4.6,0.82
+user_055,male,18-25,7w7kZbVk0wQeuM9ls4sT,Kính VR,flagship,Đà Nẵng,50,26,5.0,0.98
+user_055,male,18-25,9sG6dzlj66Gggxvhcsow,Card ghi hình,premium,Đà Nẵng,40,18,4.8,0.89
+user_055,male,18-25,B5vc0Oz15F3BbsQ5Sshs,Bàn phím,premium,TP. Hồ Chí Minh,38,17,4.7,0.87
+user_055,male,18-25,BICFyscLjQVPPiqpZ267,Ổ cứng HDD,premium,Hà Nội,36,16,4.7,0.85
+user_056,female,26-35,6HWzNFD676rte1AwMYHG,Microphone,flagship,Hà Nội,43,20,4.8,0.9
+user_056,female,26-35,ACp9jdrwYpO3gq6iTYAL,Chuột,upper mid-range,TP. Hồ Chí Minh,27,11,4.3,0.67
+user_056,female,26-35,Azg0AzQjNt434M3SMFbH,Webcam,premium,Đà Nẵng,31,13,4.5,0.74
+user_056,female,26-35,BRAduOMtyPNQLYzcyoL3,Card ghi hình,premium,Đà Nẵng,35,15,4.6,0.81
+user_057,male,36-50,6A5N9eJz9D6gW6S49uiS,Dock mở rộng cổng,flagship,Đà Nẵng,41,18,4.7,0.88
+user_057,male,36-50,CUk6IRcVzA2w13KlbW0o,Nguồn máy tính,premium,Hà Nội,29,12,4.4,0.7
+user_057,male,36-50,Ct9MjIzLswDdkSJ5EeOz,Webcam,upper mid-range,Hà Nội,26,10,4.2,0.62
+user_057,male,36-50,F0WtdCRDMqm7UfLDLub8,Bàn máy tính,premium,Hà Nội,33,14,4.5,0.78
+user_057,male,36-50,F7GxsNc9laY6TSUDI2h0,Bộ lưu điện (UPS),premium,Đà Nẵng,37,16,4.6,0.84
+user_058,female,18-25,3ukS9Y2Yaru0QbuT7fX7,Microphone,upper mid-range,Đà Nẵng,28,11,4.3,0.68
+user_058,female,18-25,43FGSqSiNr1mp1IahhVq,Tay cầm chơi game,upper mid-range,Hà Nội,26,10,4.2,0.63
+user_058,female,18-25,94QGWiyfxRsaem33yDZX,Lót chuột,upper mid-range,Hà Nội,21,8,4.0,0.52
+user_058,female,18-25,DhuReN8PfSi8w7880M4P,Bàn phím,premium,Hà Nội,32,14,4.5,0.77
+user_058,female,18-25,Dx4SRhDhyQYhKfmLHoCk,Tay cầm chơi game,upper mid-range,Hà Nội,24,9,4.1,0.58
+user_059,male,26-35,4OmgO9N9C7fIxvROPEk8,Nguồn máy tính,premium,Đà Nẵng,38,17,4.6,0.83
+user_059,male,26-35,6f0CIQArW3kIeUdzPZaw,Ổ cứng di động,premium,Đà Nẵng,36,16,4.5,0.8
+user_059,male,26-35,7zGQxKwyBf6trgD8Ytti,Tản nhiệt CPU,flagship,Đà Nẵng,46,22,4.9,0.93
+user_059,male,26-35,EJQxGRNBMsUHbK0uOi44,Nguồn máy tính,premium,Hà Nội,40,18,4.7,0.86
+user_059,male,26-35,EyTyx6irGDVvJj3ISN6v,Nguồn máy tính,premium,Đà Nẵng,42,19,4.8,0.89
+user_060,female,50+,3TsOCM20kiuaii3bifx6,Lót chuột,mid-range,Đà Nẵng,12,3,3.6,0.28
+user_060,female,50+,3w4A178RQD3BSUOQovKR,Tai nghe,flagship,Hà Nội,20,7,4.0,0.48
+user_060,female,50+,49K0Nfw44rF4PDRWLcab,Quạt case,upper mid-range,Đà Nẵng,18,6,3.9,0.42
+user_060,female,50+,6P68UFiAyQj4t8uCMEtq,Tản nhiệt CPU,upper mid-range,TP. Hồ Chí Minh,14,4,3.7,0.32
+user_060,female,50+,DhuReN8PfSi8w7880M4P,Bàn phím,premium,Hà Nội,25,10,4.2,0.52
+user_060,female,50+,F5QTHoRMP9cTLczhi9Vj,Bộ chuyển đổi (Adapter),upper mid-range,Đà Nẵng,16,5,3.8,0.38
+user_063,male,36-50,0B09APHr8urtep33OfPu,Cáp kết nối,mid-range,Hà Nội,21,8,4.2,0.56
+user_063,male,36-50,5Xi8utWXh5Q2vEYKK2Ak,Bộ lưu điện (UPS),premium,Đà Nẵng,39,17,4.7,0.86
+user_063,male,36-50,6A5N9eJz9D6gW6S49uiS,Dock mở rộng cổng,flagship,Đà Nẵng,43,20,4.8,0.91
+user_063,male,36-50,CUk6IRcVzA2w13KlbW0o,Nguồn máy tính,premium,Hà Nội,31,13,4.5,0.74
+user_063,male,36-50,F0WtdCRDMqm7UfLDLub8,Bàn máy tính,premium,Hà Nội,35,15,4.6,0.81
+user_064,female,50+,0bWseIbrIDuDmrOowjkF,USB,upper mid-range,Đà Nẵng,16,6,3.9,0.38
+user_064,female,50+,7N7bFoJ1VwF1YLZT425e,Cáp kết nối,mid-range,Hà Nội,12,4,3.7,0.3
+user_064,female,50+,C7Aj5XYnn0efjPsqmXaY,Tay cầm chơi game,upper mid-range,Hà Nội,14,5,3.8,0.34
+user_064,female,50+,DB61SQ8C1I23r4x63f4I,Microphone,upper mid-range,Đà Nẵng,18,7,4.0,0.42
+user_064,female,50+,DP0CnR4ls4s3xJm7Btjx,Thẻ nhớ,mid-range,Hà Nội,10,3,3.6,0.26
+user_065,male,18-25,2hCVlzbuSi4sqkLp16oM,Bộ chuyển đổi (Adapter),flagship,Đà Nẵng,46,22,4.9,0.92
+user_065,male,18-25,7zGQxKwyBf6trgD8Ytti,Tản nhiệt CPU,flagship,Đà Nẵng,48,23,4.9,0.94
+user_065,male,18-25,9sG6dzlj66Gggxvhcsow,Card ghi hình,premium,Đà Nẵng,42,19,4.8,0.9
+user_065,male,18-25,B5vc0Oz15F3BbsQ5Sshs,Bàn phím,premium,TP. Hồ Chí Minh,36,16,4.7,0.84
+user_065,male,18-25,BICFyscLjQVPPiqpZ267,Ổ cứng HDD,premium,Hà Nội,38,17,4.7,0.86
+user_066,female,26-35,2K7IJZpWvzrIgXHXwcu1,Loa,premium,Đà Nẵng,35,15,4.6,0.8
+user_066,female,26-35,6O8ECTeEHOYYQ9YsznYi,Ghế gaming,flagship,TP. Hồ Chí Minh,49,25,5.0,0.97
+user_066,female,26-35,ACp9jdrwYpO3gq6iTYAL,Chuột,upper mid-range,TP. Hồ Chí Minh,28,11,4.3,0.68
+user_066,female,26-35,Azg0AzQjNt434M3SMFbH,Webcam,premium,Đà Nẵng,33,14,4.5,0.76
+user_066,female,26-35,BRAduOMtyPNQLYzcyoL3,Card ghi hình,premium,Đà Nẵng,37,16,4.6,0.83
+user_067,male,36-50,3aZhR1AV5g5rWdhEi9yE,Nguồn máy tính,premium,Đà Nẵng,40,18,4.7,0.88
+user_067,male,36-50,4OmgO9N9C7fIxvROPEk8,Nguồn máy tính,premium,Đà Nẵng,36,15,4.5,0.81
+user_067,male,36-50,Ct9MjIzLswDdkSJ5EeOz,Webcam,upper mid-range,Hà Nội,27,10,4.2,0.63
+user_067,male,36-50,EJQxGRNBMsUHbK0uOi44,Nguồn máy tính,premium,Hà Nội,34,14,4.5,0.78
+user_067,male,36-50,F7GxsNc9laY6TSUDI2h0,Bộ lưu điện (UPS),premium,Đà Nẵng,38,17,4.6,0.85
+user_068,female,18-25,3ukS9Y2Yaru0QbuT7fX7,Microphone,upper mid-range,Đà Nẵng,29,11,4.3,0.69
+user_068,female,18-25,43FGSqSiNr1mp1IahhVq,Tay cầm chơi game,upper mid-range,Hà Nội,27,10,4.2,0.64
+user_068,female,18-25,94QGWiyfxRsaem33yDZX,Lót chuột,upper mid-range,Hà Nội,22,8,4.0,0.53
+user_068,female,18-25,DhuReN8PfSi8w7880M4P,Bàn phím,premium,Hà Nội,33,14,4.5,0.78
+user_068,female,18-25,Dx4SRhDhyQYhKfmLHoCk,Tay cầm chơi game,upper mid-range,Hà Nội,25,9,4.1,0.59
+user_069,male,26-35,1ZavJAbIqfdSjTYt82iD,Chuột,premium,Đà Nẵng,39,17,4.7,0.86
+user_069,male,26-35,2eMNIX0NDafnr3PSk9or,Màn hình,flagship,Đà Nẵng,47,23,4.9,0.95
+user_069,male,26-35,6f0CIQArW3kIeUdzPZaw,Ổ cứng di động,premium,Đà Nẵng,37,16,4.6,0.82
+user_069,male,26-35,7psT7UUtDRjyV1CmznLp,Ổ cứng SSD,premium,Hà Nội,41,18,4.7,0.87
+user_069,male,26-35,EyTyx6irGDVvJj3ISN6v,Nguồn máy tính,premium,Đà Nẵng,44,20,4.8,0.91
+user_070,female,50+,0Wa0RIQcxYAWvgR2KFog,Webcam,premium,Hà Nội,21,8,4.1,0.5
+user_070,female,50+,3TsOCM20kiuaii3bifx6,Lót chuột,mid-range,Đà Nẵng,13,4,3.7,0.3
+user_070,female,50+,49K0Nfw44rF4PDRWLcab,Quạt case,upper mid-range,Đà Nẵng,19,7,4.0,0.44
+user_070,female,50+,6P68UFiAyQj4t8uCMEtq,Tản nhiệt CPU,upper mid-range,TP. Hồ Chí Minh,15,5,3.8,0.34
+user_070,female,50+,F5QTHoRMP9cTLczhi9Vj,Bộ chuyển đổi (Adapter),upper mid-range,Đà Nẵng,17,6,3.9,0.4
+user_071,male,26-35,3ukS9Y2Yaru0QbuT7fX7,Microphone,upper mid-range,Đà Nẵng,24,9,4.3,0.62
+user_071,male,26-35,43FGSqSiNr1mp1IahhVq,Tay cầm chơi game,upper mid-range,Hà Nội,20,7,4.1,0.55
+user_071,male,26-35,94QGWiyfxRsaem33yDZX,Lót chuột,upper mid-range,Hà Nội,16,5,3.9,0.45
+user_072,female,36-50,C7Aj5XYnn0efjPsqmXaY,Tay cầm chơi game,upper mid-range,Hà Nội,19,7,4.0,0.52
+user_072,female,36-50,DB61SQ8C1I23r4x63f4I,Microphone,upper mid-range,Đà Nẵng,22,8,4.2,0.58
+user_072,female,36-50,DP0CnR4ls4s3xJm7Btjx,Thẻ nhớ,mid-range,Hà Nội,15,4,3.8,0.38
+user_073,male,18-25,7N7bFoJ1VwF1YLZT425e,Cáp kết nối,mid-range,Hà Nội,18,6,4.0,0.48
+user_073,male,18-25,Dx4SRhDhyQYhKfmLHoCk,Tay cầm chơi game,upper mid-range,Hà Nội,21,8,4.2,0.58
+user_073,male,18-25,3w4A178RQD3BSUOQovKR,Tai nghe,flagship,Hà Nội,28,12,4.5,0.72
+user_074,female,26-35,6f0CIQArW3kIeUdzPZaw,Ổ cứng di động,premium,Đà Nẵng,26,11,4.4,0.68
+user_074,female,26-35,7psT7UUtDRjyV1CmznLp,Ổ cứng SSD,premium,Hà Nội,30,13,4.6,0.75
+user_074,female,26-35,BICFyscLjQVPPiqpZ267,Ổ cứng HDD,premium,Hà Nội,24,9,4.3,0.62
+user_075,male,36-50,Ct9MjIzLswDdkSJ5EeOz,Webcam,upper mid-range,Hà Nội,23,9,4.2,0.62
+user_075,male,36-50,F0WtdCRDMqm7UfLDLub8,Bàn máy tính,premium,Hà Nội,27,11,4.4,0.68
+user_075,male,36-50,3l1J8i4vJtRUvqGeGuzc,Bàn máy tính,premium,TP. Hồ Chí Minh,31,14,4.6,0.78
+user_076,female,18-25,FlsPhgVXw1OfPVT4NINZ,Kính VR,flagship,Đà Nẵng,55,29,5.0,0.98
+user_076,female,18-25,G8R4t7sV9uU6Mz6AWISH,Tai nghe,premium,Đà Nẵng,33,15,4.6,0.82
+user_076,female,18-25,K6XDm2ZnglXxpO8mOX4J,Bàn phím,upper mid-range,Đà Nẵng,25,10,4.2,0.62
+user_077,male,50+,HcGRuXnfR14InKdNXopQ,Quạt case,mid-range,TP. Hồ Chí Minh,10,2,3.6,0.28
+user_077,male,50+,KyvmiUFL62dUtcwhPb9l,USB,mid-range,TP. Hồ Chí Minh,8,1,3.4,0.22
+user_077,male,50+,Inhx0t1eTmuGpxcBX20G,Lót chuột,mid-range,TP. Hồ Chí Minh,12,3,3.7,0.32
+user_078,female,26-35,Lfy9WCtXY4GturyDeCyC,Ổ cứng SSD,premium,TP. Hồ Chí Minh,34,16,4.7,0.85
+user_078,female,26-35,PWDr9nSUmCxOYJZB3f1D,Microphone,premium,TP. Hồ Chí Minh,28,12,4.4,0.68
+user_078,female,26-35,Gse1cbjmkqs3UWDAg334,Bàn phím,premium,TP. Hồ Chí Minh,32,14,4.5,0.76
+user_078,female,26-35,QLvvZhFUUeliS3GBPaS0,Chuột,premium,TP. Hồ Chí Minh,30,13,4.4,0.72
+user_079,male,18-25,IuWTBa3Bwr2P2Itci10p,Màn hình,flagship,Hà Nội,46,22,4.9,0.95
+user_079,male,18-25,OKaND6N9NhvfTYdv3bPW,Loa,premium,Hà Nội,27,11,4.4,0.68
+user_079,male,18-25,Ql1l6SBk9CVIK7giDmGW,Tay cầm chơi game,premium,Hà Nội,35,16,4.7,0.84
+user_080,female,36-50,FmJ32JHqTYDe6MctIolL,Nguồn máy tính,premium,Hà Nội,26,10,4.3,0.65
+user_080,female,36-50,PfvcHgbv2nwA8QrXBCBC,Tản nhiệt CPU,upper mid-range,Hà Nội,18,6,4.0,0.48
+user_080,female,36-50,Y6g0segaxXzVKNB83IYc,Webcam,upper mid-range,Hà Nội,22,8,4.1,0.55
+user_081,male,26-35,MpfBm0kV2d9FejNLcmHk,Ổ cứng di động,flagship,TP. Hồ Chí Minh,48,25,4.9,0.94
+user_081,male,26-35,WnKd4hh4KKmoCaePcNGd,Ghế gaming,flagship,TP. Hồ Chí Minh,52,28,5.0,0.98
+user_081,male,26-35,gztvn54GVk32SCXBiksM,Card ghi hình,premium,TP. Hồ Chí Minh,38,17,4.7,0.86
+user_082,female,50+,Jh5eplFR9EUU8YsVxQpz,Quạt case,mid-range,TP. Hồ Chí Minh,9,2,3.5,0.24
+user_082,female,50+,d8nJwp12u0i95gLb5tUK,Thẻ nhớ,mid-range,TP. Hồ Chí Minh,11,3,3.6,0.28
+user_082,female,50+,gu1lxufOZHbcNl83h5Gy,USB,mid-range,TP. Hồ Chí Minh,7,1,3.4,0.20
+user_083,male,18-25,QP6it4YuIGjvnyzFWdaP,Ổ cứng SSD,upper mid-range,Đà Nẵng,28,12,4.3,0.68
+user_083,male,18-25,T7sSVd1nxZbkXjKlA69N,Bộ chuyển đổi (Adapter),upper mid-range,Đà Nẵng,22,8,4.1,0.58
+user_083,male,18-25,Vda8emPPf9Pum3mliav2,Lót chuột,upper mid-range,Đà Nẵng,15,5,3.9,0.45
+user_084,female,26-35,Z6v9IyPRSegwaTrEJfoE,Màn hình,premium,TP. Hồ Chí Minh,41,19,4.8,0.89
+user_084,female,26-35,XmkcH6fJ1CTOlqHXDGFF,Bàn phím,premium,TP. Hồ Chí Minh,29,12,4.4,0.68
+user_084,female,26-35,SfzR1GbfK8PioUpcEaqJ,Chuột,premium,TP. Hồ Chí Minh,33,15,4.6,0.80
+user_085,male,36-50,OO9Pj4XIMfnw9qrxuiS3,Ổ cứng SSD,premium,Hà Nội,36,16,4.6,0.84
+user_085,male,36-50,VuT2ry0ma0oH1x0Kytcq,Webcam,premium,Hà Nội,31,13,4.5,0.74
+user_085,male,36-50,XhQj0pN469JxLe5fFqPv,Tai nghe,premium,Hà Nội,39,18,4.7,0.88
+user_086,female,18-25,H1r9KWV4gpj2PN3bW3TM,Thẻ nhớ,upper mid-range,Đà Nẵng,19,7,4.0,0.52
+user_086,female,18-25,RXTs0pvD8LFZdjEn0T75,Cáp kết nối,mid-range,Đà Nẵng,14,4,3.8,0.38
+user_086,female,18-25,WpzRa243niYOVPZSy7DW,USB,mid-range,Đà Nẵng,16,5,3.9,0.42
+user_087,male,26-35,dBxN81oeChoRjYH8N9Y5,Màn hình,flagship,TP. Hồ Chí Minh,49,24,4.9,0.96
+user_087,male,26-35,VmObfbNobQP88ceMMOb1,Ổ cứng HDD,flagship,Hà Nội,45,21,4.8,0.92
+user_087,male,26-35,i1x5pvXNLBFloJoCtVT6,Bàn máy tính,flagship,Hà Nội,47,23,4.9,0.94
+user_088,female,50+,PV1ryU9zMFO6zcYAuNxU,Quạt case,mid-range,TP. Hồ Chí Minh,8,2,3.4,0.22
+user_088,female,50+,hVATDU0R4jX6xnOeTF2o,Thẻ nhớ,mid-range,Hà Nội,10,2,3.5,0.26
+user_088,female,50+,Z54LKTLx6f9g1ncxroHm,Cáp kết nối,mid-range,TP. Hồ Chí Minh,6,1,3.3,0.18
+user_089,male,18-25,SF0raFLat9hHdKRfCNY2,Bàn phím,premium,Đà Nẵng,35,16,4.7,0.84
+user_089,male,18-25,ZiTcGz3FHVttZeiKqDWG,Ổ cứng SSD,premium,Đà Nẵng,32,14,4.5,0.76
+user_089,male,18-25,erPAZz6mD6NtyklMgrDT,Chuột,premium,Đà Nẵng,29,13,4.4,0.72
+user_090,female,36-50,VYjxSn7SgqZnQLJ3DhKE,Nguồn máy tính,premium,Hà Nội,27,11,4.3,0.68
+user_090,female,36-50,N2n9zXefMib2uomWoaya,Webcam,premium,Hà Nội,24,9,4.2,0.62
+user_090,female,36-50,W3RtHiddMp5lFODHNG1f,Tay cầm chơi game,upper mid-range,Hà Nội,20,7,4.0,0.52
+user_091,male,26-35,PqJbOcc9FCSeBUcHLQpY,Kính VR,flagship,Hà Nội,58,31,5.0,0.99
+user_091,male,26-35,LD8BQDehiJEAvyAxdhk3,Màn hình,flagship,Hà Nội,51,26,4.9,0.97
+user_091,male,26-35,h2hheIqCMLOTmjvP5WFi,Tai nghe,flagship,Hà Nội,44,20,4.8,0.91
+user_091,male,26-35,jCSjz79sCfASuFxilrYp,Chuột,premium,Hà Nội,37,17,4.7,0.86
+user_092,female,18-25,dSohreHvsQ9N5ORdYZn1,Bàn phím,upper mid-range,Đà Nẵng,23,9,4.1,0.58
+user_092,female,18-25,k0CGzFVPjY7lpBIq0CC1,Tay cầm chơi game,upper mid-range,TP. Hồ Chí Minh,21,8,4.0,0.55
+user_093,male,50+,Ubo5bvZh0WBDnDFeEuN8,Quạt case,mid-range,Hà Nội,7,1,3.3,0.18
+user_093,male,50+,fYTeVLys37SA3seA7s8f,Cáp kết nối,mid-range,Đà Nẵng,9,2,3.4,0.24
+user_093,male,50+,J2uFstgzbpQ269KL7VqE,Cáp kết nối,mid-range,Đà Nẵng,11,3,3.6,0.30
+user_094,female,26-35,Vl1CmuuvjpidOpnUhfEF,Màn hình,premium,TP. Hồ Chí Minh,38,17,4.7,0.86
+user_094,female,26-35,TCCab2moc0PS2teWcIW0,Tản nhiệt CPU,premium,TP. Hồ Chí Minh,31,13,4.5,0.74
+user_094,female,26-35,jamryqfPqsYbmpy6Wmdj,Tay cầm chơi game,premium,TP. Hồ Chí Minh,34,15,4.6,0.80
+user_095,male,18-25,RtI4o359Tp13y5Py4UEY,Ổ cứng SSD,flagship,Đà Nẵng,43,21,4.8,0.92
+user_095,male,18-25,SgFgmEORiA7mvEKQo3U7,Kính VR,flagship,Đà Nẵng,48,25,4.9,0.95
+user_095,male,18-25,OMgYP7K3hI2Uo2eWXLEp,Tai nghe,flagship,Đà Nẵng,41,19,4.8,0.89
+user_095,male,18-25,beDwN0elgwK3NPkaTnQh,Bàn phím,premium,Đà Nẵng,36,16,4.6,0.82
+user_096,female,36-50,GaiQmfBoeRS7B1YKjdsU,Tản nhiệt CPU,upper mid-range,TP. Hồ Chí Minh,19,6,4.0,0.48
+user_096,female,36-50,KRoyVVMhoXmThOKHOEy5,Bàn phím,upper mid-range,TP. Hồ Chí Minh,22,8,4.1,0.58
+user_096,female,36-50,XJVy0tcZSdvFejCSx6Ko,Microphone,upper mid-range,TP. Hồ Chí Minh,25,10,4.2,0.65
+user_097,male,26-35,badB5DZx66dFTTwpGqmB,Dock mở rộng cổng,flagship,Hà Nội,42,19,4.8,0.90
+user_097,male,26-35,ZkcfcOfNfWKbMbF1JVUY,Bộ lưu điện (UPS),flagship,Hà Nội,46,22,4.9,0.93
+user_097,male,26-35,eYcKHEYzAQpFC6V632Ig,Màn hình,flagship,Hà Nội,62,35,5.0,1.00
+user_098,female,50+,Nf7qoH7RSfL9EhnRjWXj,Lót chuột,mid-range,TP. Hồ Chí Minh,8,2,3.4,0.22
+user_098,female,50+,YDCd4RlROswVgJKH4DD0,Thẻ nhớ,upper mid-range,Hà Nội,12,3,3.7,0.32
+user_099,male,18-25,jHxw6V54lwU0bCehWfiE,Bàn phím,premium,Đà Nẵng,33,14,4.5,0.76
+user_099,male,18-25,ODb3krdkpmvgBqgEBLZY,Tai nghe,premium,Đà Nẵng,30,12,4.4,0.68
+user_099,male,18-25,WVahorszLfK1qQYOT97V,Card ghi hình,premium,TP. Hồ Chí Minh,37,17,4.7,0.86
+user_100,female,26-35,HzplU7pS9j0yB0FpdsB6,Webcam,premium,TP. Hồ Chí Minh,35,15,4.6,0.80
+user_100,female,26-35,P4d7ARIK34xBKQyTDQtb,Ổ cứng SSD,premium,TP. Hồ Chí Minh,32,14,4.5,0.76
+user_100,female,26-35,dwhi77HIrpuqwWdLRBLm,Chuột,premium,TP. Hồ Chí Minh,29,12,4.4,0.68
