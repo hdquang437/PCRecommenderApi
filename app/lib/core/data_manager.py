@@ -313,10 +313,8 @@ class DataManager:
             # Rating mặc định = 1.0 (thấp nhất) thay vì 3.0 (trung bình)
             self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 1.0}, inplace=True)
             
-            # FIXED NORMALIZATION VALUES - Based on single product interaction patterns
-            FIXED_MAX_BUYS = (self.data['buy_times'].mean() + 1e-6) * 0.6      # Max purchases of same product
-            # Label chính sử dụng buy_times
-            self.data["label"] = (self.data["buy_times"] / FIXED_MAX_BUYS).clip(0, 1)
+            # Label chính sử dụng buy_times (có mua hay không)
+            self.data["label"] = (self.data["buy_times"] > 0).astype(int)
             
             print(f"Calculated labels:")
             print(f"  - Label range: {self.data['label'].min():.4f} to {self.data['label'].max():.4f}")
@@ -668,28 +666,17 @@ class DataManager:
             # Fill missing values
             self.data.fillna({"click_times": 0, "buy_times": 0, "rating": 1.0}, inplace=True)
             
-            # Calculate dynamic max_buys for normalization
-            actual_max_buys = self.data['buy_times'].max()
-            FIXED_MAX_BUYS = max(1, int(actual_max_buys))  # At least 1
-            
             print(f"📊 Data statistics:")
-            print(f"  Max buy_times: {actual_max_buys}")
-            print(f"  Using FIXED_MAX_BUYS: {FIXED_MAX_BUYS}")
+
+            # calculate label based on buy_times (buy or not)
+            self.data["label"] = (self.data["buy_times"] > 0).astype(int)
             
-            # Create label using same logic as Firebase loading
-            if 'label' not in self.data.columns:
-                self.data["label"] = (self.data["buy_times"] / FIXED_MAX_BUYS).clip(0, 1)
-                print(f"✅ Created labels from buy_times")
-            else:
-                print(f"✅ Using existing labels from CSV")
-            
-            print(f"📈 Label statistics:")
-            print(f"  Label range: {self.data['label'].min():.4f} to {self.data['label'].max():.4f}")
-            print(f"  Label mean: {self.data['label'].mean():.4f}")
-            print(f"  Labels > 0: {(self.data['label'] > 0).sum()}/{len(self.data)}")
+            # print(f"📈 Label statistics:")
+            # print(f"  Label range: {self.data['label'].min():.4f} to {self.data['label'].max():.4f}")
+            # print(f"  Label mean: {self.data['label'].mean():.4f}")
+            # print(f"  Labels > 0: {(self.data['label'] > 0).sum()}/{len(self.data)}")
             
             # Store metadata for build_empty_sample consistency
-            self.csv_max_buys = FIXED_MAX_BUYS
             
             print(f"✅ CSV data processed successfully - {len(self.data)} samples")
             
@@ -698,7 +685,7 @@ class DataManager:
             print(f"  Users: {df['user_id'].nunique()}")
             print(f"  Products: {df['product_id'].nunique()}")  
             print(f"  Interactions: {len(df)}")
-            print(f"  Buy times range: {df['buy_times'].min()} - {df['buy_times'].max()}")
+            # print(f"  Buy times range: {df['buy_times'].min()} - {df['buy_times'].max()}")
             
             return True
             
@@ -707,3 +694,17 @@ class DataManager:
             import traceback
             traceback.print_exc()
             return False
+        
+    def create_dataset_from_dataframe(self, df):
+        """Create TensorFlow dataset from DataFrame"""
+        # Tạo TensorFlow dataset
+        dataset = tf.data.Dataset.from_tensor_slices((
+            dict(df.drop(columns=["user_id", "product_id"])),
+            df["label"]
+        ))
+
+        dataset = dataset.map(lambda x, y: (
+            {k: tf.cast(v, tf.float32) if v.dtype == tf.float64 else tf.cast(v, tf.int32) for k, v in x.items()},
+            tf.cast(y, tf.float32)
+        ))
+        return dataset
