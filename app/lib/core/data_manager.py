@@ -33,8 +33,8 @@ from ...lib.models.shop_repository import ShopRepository
 from ...paths import FIREBASE_KEY_PATH
 
 # CONSTANTS cho stream data optimization
-RELOAD_DEBOUNCE_DELAY = 20.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
-MAX_RELOAD_DELAY = 60.0     # Thời gian tối đa chờ trước khi buộc phải reload
+RELOAD_DEBOUNCE_DELAY = 120.0  # Số giây chờ trước khi reload (có thể điều chỉnh)
+MAX_RELOAD_DELAY = 300.0     # Thời gian tối đa chờ trước khi buộc phải reload
 IGNORE_CHANGES_DURING_RELOAD = True  # Bỏ qua các thay đổi trong quá trình reload
 
 class DataManager:

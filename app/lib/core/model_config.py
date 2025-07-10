@@ -5,16 +5,21 @@ BATCH_SIZE = 8
 RANDOM_SEED = 42
 
 # Data Source Configuration 
-USE_CSV = os.getenv("USE_CSV_DATA", "true").lower() == "true"
 CSV_DATA_PATH = os.getenv("CSV_DATA_PATH", "app/lib/samples")
 CSV_FILENAME = os.getenv("CSV_FILENAME", "test_mock_dataset.csv")
 
-# Development override - Force CSV mode for development
-DEVELOPMENT_MODE = True  # Set to False for production
+# Development override - Control CSV mode
+DEVELOPMENT_MODE = False  # Set to False for production
+
 if DEVELOPMENT_MODE:
+    # Development mode: Force CSV usage
     USE_CSV = True
     print(f"🔧 DEVELOPMENT MODE: Forcing CSV usage")
     print(f"📁 CSV File: {CSV_DATA_PATH}/{CSV_FILENAME}")
+else:
+    # Production mode: Use environment variable or default to Firebase
+    USE_CSV = os.getenv("USE_CSV_DATA", "false").lower() == "true"
+    print(f"🏭 PRODUCTION MODE: CSV usage controlled by environment variable")
 
 # Print current config for debugging
 print(f"🔧 Model Config Loaded:")
