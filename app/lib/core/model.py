@@ -14,6 +14,24 @@ from keras import layers
 tf.get_logger().setLevel('FATAL')
 tf.autograph.set_verbosity(0)
 
+def focal_loss(gamma=2.0, alpha=0.25):
+    def loss_fn(y_true, y_pred, sample_weight=None):
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7)
+
+        p_t = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        alpha_factor = tf.where(tf.equal(y_true, 1), alpha, 1 - alpha)
+        focal_weight = alpha_factor * tf.pow(1. - p_t, gamma)
+        loss = -focal_weight * tf.math.log(p_t)
+
+        if sample_weight is not None:
+            sample_weight = tf.cast(sample_weight, tf.float32)
+            loss *= sample_weight
+
+        return tf.reduce_mean(loss)
+
+    return loss_fn
+
 class WideAndDeepModel(tfrs.Model):
     def __init__(self, vocab_sizes=None, name="wide_and_deep_model", *args, **kwargs):
         super(WideAndDeepModel, self).__init__(name=name, *args, **kwargs)
@@ -61,11 +79,13 @@ class WideAndDeepModel(tfrs.Model):
         ], name="deep_network")
 
         self.task = tfrs.tasks.Ranking(
-            loss=tf.keras.losses.MeanSquaredError(),
+            loss=focal_loss(gamma=2.0, alpha=0.25),
             metrics=[
-                tf.keras.metrics.RootMeanSquaredError(),
-                tf.keras.metrics.MeanAbsoluteError(),
-                tf.keras.metrics.R2Score(name="r2_score")
+                tf.keras.metrics.BinaryAccuracy(name="accuracy"),
+                tf.keras.metrics.Precision(name="precision"),
+                tf.keras.metrics.Recall(name="recall"),
+                tf.keras.metrics.AUC(name="auc"),
+                tf.keras.metrics.F1Score(name="f1_score")
             ],
             name="ranking_task"
         )

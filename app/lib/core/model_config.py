@@ -7,7 +7,7 @@ RANDOM_SEED = 42
 # Data Source Configuration 
 USE_CSV = os.getenv("USE_CSV_DATA", "true").lower() == "true"
 CSV_DATA_PATH = os.getenv("CSV_DATA_PATH", "app/lib/samples")
-CSV_FILENAME = os.getenv("CSV_FILENAME", "test_dataset_v2.csv")
+CSV_FILENAME = os.getenv("CSV_FILENAME", "test_mock_dataset.csv")
 
 # Development override - Force CSV mode for development
 DEVELOPMENT_MODE = True  # Set to False for production
