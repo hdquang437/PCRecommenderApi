@@ -148,10 +148,22 @@ class WideAndDeepModel(tfrs.Model):
             tf.einsum('bi,bj->bij', type_onehot, price_onehot),
             [-1, self.vocab_sizes["type"] * self.vocab_sizes["price_range"]]
         )
+
+        # Age × Price (Độ tuổi × Giá)
+        age_price_cross = tf.reshape(
+            tf.einsum('bi,bj->bij', age_onehot, price_onehot),
+            [-1, self.vocab_sizes["age_range"] * self.vocab_sizes["price_range"]]
+        )
+
+        # Type × Gender (Loại sản phẩm × Giới tính)
+        type_gender_cross = tf.reshape(
+            tf.einsum('bi,bj->bij', type_onehot, gender_onehot),
+            [-1, self.vocab_sizes["type"] * self.vocab_sizes["gender"]]
+        )
         
         wide_input = tf.concat([
             type_onehot, location_onehot, gender_onehot, age_onehot, price_onehot,
-            gender_age_cross, type_price_cross,  # Cross features
+            gender_age_cross, type_price_cross, age_price_cross, type_gender_cross,  # Cross features
             numerical_features
         ], axis=1)
 
